@@ -5,8 +5,10 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
 // Add Renderer
 const renderer = new THREE.WebGLRenderer({
+  antialias: true,
   canvas: document.querySelector("#bg"),
 });
+
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -25,11 +27,11 @@ camera.position.set(80, 70, 170);
 
 // Miscellaneous
 const controls = new OrbitControls(camera, renderer.domElement);
+controls.target = new THREE.Vector3(80, 0, 50);
 // const gridHelper = new THREE.GridHelper(500, 50);
 // scene.add(gridHelper);
 // const axesHelper = new THREE.AxesHelper(2);
 // scene.add(axesHelper);
-controls.target = new THREE.Vector3(80, 0, 50);
 
 // Lighting
 const hemiLight = new THREE.HemisphereLight(0xffeeb1, 0x080820, 2);
@@ -38,15 +40,9 @@ spotLight.castShadow = true;
 spotLight.shadow.bias = -0.0001;
 spotLight.shadow.mapSize.width = 1024 * 4;
 spotLight.shadow.mapSize.height = 1024 * 4;
-
 scene.add(hemiLight, spotLight);
 
 // Grid
-const material = new THREE.LineBasicMaterial({
-  color: 0xffffff,
-  linewidth: 100,
-});
-
 const points = [];
 // Horizontal
 points.push(new THREE.Vector3(0, 0, 0));
@@ -57,7 +53,6 @@ points.push(new THREE.Vector3(0, 0, 60));
 points.push(new THREE.Vector3(150, 0, 60));
 points.push(new THREE.Vector3(150, 0, 90));
 points.push(new THREE.Vector3(0, 0, 90));
-
 //Vertical
 points.push(new THREE.Vector3(0, 0, 0));
 points.push(new THREE.Vector3(30, 0, 0));
@@ -72,6 +67,10 @@ points.push(new THREE.Vector3(150, 0, 0));
 points.push(new THREE.Vector3(150, 0, 90));
 
 const geometry = new THREE.BufferGeometry().setFromPoints(points);
+const material = new THREE.LineBasicMaterial({
+  color: 0xffffff,
+  linewidth: 100,
+});
 const line = new THREE.Line(geometry, material);
 scene.add(line);
 
@@ -100,7 +99,7 @@ const puck = (cords, color) => {
   scene.add(topPuck, bottomPuck);
 };
 
-function addPucks() {
+function AddRandomPucks() {
   const puckPos = [];
 
   while (puckPos.length < 5) {
@@ -108,7 +107,6 @@ function addPucks() {
     let randNumsY = Math.floor(Math.random() * 4) * 30;
 
     const coord = [randNumsX, 0, randNumsY];
-    console.log(coord);
 
     let inArray = false;
 
@@ -130,10 +128,9 @@ function addPucks() {
   }
 }
 
-addPucks();
+AddRandomPucks();
 
-puck([60, 0, 30], 0xff4d4d);
-
+// Models
 const gltfLoader = new GLTFLoader();
 
 const carMoveSpeed = 0.3;
@@ -154,50 +151,53 @@ gltfLoader.load("public/car/scene.gltf", (gltf) => {
   scene.add(carModel);
 });
 
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+  controls.update();
+
+  if (moveDir[0]) {
+    carPos[0] += Math.cos(carRot) * carMoveSpeed;
+    carPos[1] -= Math.sin(carRot) * carMoveSpeed;
+  } else if (moveDir[1]) {
+    carPos[0] -= Math.cos(carRot) * carMoveSpeed;
+    carPos[1] += Math.sin(carRot) * carMoveSpeed;
+  } else if (moveDir[2]) {
+    carRot += carTurnSpeed;
+  } else if (moveDir[3]) {
+    carRot -= carTurnSpeed;
+  }
+
+  if (carModel) {
+    carModel.position.set(carPos[0], 1.6, carPos[1]);
+    carModel.rotation.y = carRot;
+  }
+}
+
+animate();
+
 // INPUT
-const forward = document.querySelector("#forward");
-const backward = document.querySelector("#backward");
-const left = document.querySelector("#left");
-const right = document.querySelector("#right");
+const directions = {
+  forward: [1, 0, 0, 0],
+  backward: [0, 1, 0, 0],
+  left: [0, 0, 1, 0],
+  right: [0, 0, 0, 1],
+};
 
-forward.addEventListener("mousedown", () => {
-  moveDir = [1, 0, 0, 0];
-  SendDir("forward");
+const buttons = document.querySelectorAll(".inputButton");
+buttons.forEach((button) => {
+  button.addEventListener("mousedown", () => {
+    const direction = directions[button.id];
+    moveDir = direction;
+    SendDir(button.id);
+  });
 });
 
-forward.addEventListener("mouseup", () => {
-  moveDir = [0, 0, 0, 0];
-  SendDir("stop");
-});
-
-backward.addEventListener("mousedown", () => {
-  moveDir = [0, 1, 0, 0];
-  SendDir("backward");
-});
-
-backward.addEventListener("mouseup", () => {
-  moveDir = [0, 0, 0, 0];
-  SendDir("stop");
-});
-
-left.addEventListener("mousedown", () => {
-  moveDir = [0, 0, 1, 0];
-  SendDir("left");
-});
-
-left.addEventListener("mouseup", () => {
-  moveDir = [0, 0, 0, 0];
-  SendDir("stop");
-});
-
-right.addEventListener("mousedown", () => {
-  moveDir = [0, 0, 0, 1];
-  SendDir("right");
-});
-
-right.addEventListener("mouseup", () => {
-  moveDir = [0, 0, 0, 0];
-  SendDir("stop");
+buttons.forEach((button) => {
+  button.addEventListener("mouseup", () => {
+    moveDir = [0, 0, 0, 0];
+    SendDir("stop");
+  });
 });
 
 let socket = undefined;
@@ -240,7 +240,6 @@ function sendCommand(command) {
 }
 
 function SendDir(dir) {
-  console.log(dir);
   if (socket != undefined) {
     socket.send(dir);
   } else {
@@ -253,28 +252,3 @@ const socketButton = document.querySelector("#connectButton");
 socketButton.addEventListener("mousedown", () => {
   connect_socket();
 });
-
-function animate() {
-  requestAnimationFrame(animate);
-  renderer.render(scene, camera);
-  controls.update();
-
-  if (moveDir[0]) {
-    carPos[0] += Math.cos(carRot) * carMoveSpeed;
-    carPos[1] -= Math.sin(carRot) * carMoveSpeed;
-  } else if (moveDir[1]) {
-    carPos[0] -= Math.cos(carRot) * carMoveSpeed;
-    carPos[1] += Math.sin(carRot) * carMoveSpeed;
-  } else if (moveDir[2]) {
-    carRot += carTurnSpeed;
-  } else if (moveDir[3]) {
-    carRot -= carTurnSpeed;
-  }
-
-  if (carModel) {
-    carModel.position.set(carPos[0], 1.6, carPos[1]);
-    carModel.rotation.y = carRot;
-  }
-}
-
-animate();
