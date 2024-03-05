@@ -201,18 +201,19 @@ buttons.forEach((button) => {
 });
 
 let socket = undefined;
+const statusComponent = document.querySelector("#status").textContent;
 
 function connect_socket() {
   socket = new WebSocket("ws://192.168.4.1:80/connect-websocket");
   console.log(socket);
 
   socket.addEventListener("open", (event) => {
-    document.getElementById("status").textContent = "Status: Connected";
+    statusComponent = "Status: Connected";
   });
 
   socket.addEventListener("close", (event) => {
     socket = undefined;
-    document.getElementById("status").textContent = "Status: Disconnected";
+    statusComponent = "Status: Disconnected";
   });
 
   socket.addEventListener("message", (event) => {
@@ -221,7 +222,7 @@ function connect_socket() {
 
   socket.addEventListener("error", (event) => {
     socket = undefined;
-    document.getElementById("status").textContent = "Status: Disconnected";
+    statusComponent = "Status: Disconnected";
   });
 }
 
