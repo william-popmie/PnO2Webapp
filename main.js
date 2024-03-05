@@ -6,7 +6,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 // Add Renderer
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
-  canvas: document.querySelector("#bg"),
+  canvas: document.querySelector("#threeCanvas"),
 });
 
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -176,7 +176,9 @@ function animate() {
 
 animate();
 
-// INPUT
+// Manual Input
+document.addEventListener("contextmenu", (event) => event.preventDefault());
+
 const directions = {
   forward: [1, 0, 0, 0],
   backward: [0, 1, 0, 0],
@@ -200,20 +202,95 @@ buttons.forEach((button) => {
   });
 });
 
+// Canvas Input
+const puckCanvas = document.querySelector("#puckInput");
+const puckCtx = puckCanvas.getContext("2d");
+
+puckCtx.beginPath();
+
+//Horizontal
+puckCtx.moveTo(60, 0);
+puckCtx.lineTo(60, 180);
+puckCtx.moveTo(120, 0);
+puckCtx.lineTo(120, 180);
+puckCtx.moveTo(180, 0);
+puckCtx.lineTo(180, 180);
+puckCtx.moveTo(240, 0);
+puckCtx.lineTo(240, 180);
+
+puckCtx.moveTo(0, 60);
+puckCtx.lineTo(300, 60);
+puckCtx.moveTo(0, 120);
+puckCtx.lineTo(300, 120);
+
+puckCtx.stroke();
+
+let xPos, yPos;
+const r = 4;
+
+function DrawWhite(x, y) {
+  puckCtx.fillStyle = "#ffffff";
+  puckCtx.beginPath();
+  puckCtx.arc(60, 60, r, 0, 2 * Math.PI);
+  puckCtx.arc(120, 60, r, 0, 2 * Math.PI);
+  puckCtx.arc(180, 60, r, 0, 2 * Math.PI);
+  puckCtx.arc(240, 60, r, 0, 2 * Math.PI);
+  puckCtx.fill();
+
+  puckCtx.beginPath();
+  puckCtx.arc(60, 120, r, 0, 2 * Math.PI);
+  puckCtx.arc(120, 120, r, 0, 2 * Math.PI);
+  puckCtx.arc(180, 120, r, 0, 2 * Math.PI);
+  puckCtx.arc(240, 120, r, 0, 2 * Math.PI);
+  puckCtx.fill();
+
+  puckCtx.fillStyle = "#ff0000";
+  puckCtx.beginPath();
+  puckCtx.arc(x * 2, y * 2, r, 0, 2 * Math.PI);
+  puckCtx.fill();
+
+  console.log(x, y);
+}
+
+DrawWhite();
+
+puckCanvas.addEventListener("mousemove", (e) => {
+  const rect = puckCanvas.getBoundingClientRect();
+  xPos = Math.round((Math.abs(e.clientX - rect.left) * 150) / rect.width);
+  yPos = Math.round((Math.abs(e.clientY - rect.top) * 90) / rect.height);
+});
+
+puckCanvas.addEventListener("mousedown", (e) => {
+  let sideX = 0;
+  let sideY = 0;
+
+  if (xPos % 30 > 15) sideX = 1;
+  else sideX = 0;
+
+  if (yPos % 30 > 15) sideY = 1;
+  else sideY = 0;
+
+  const xSnap = xPos - (xPos % 30) + sideX * 30;
+  const ySnap = yPos - (yPos % 30) + sideY * 30;
+
+  DrawWhite(xSnap, ySnap);
+});
+
+// Server Setup
 let socket = undefined;
-const statusComponent = document.querySelector("#status").textContent;
+const statusTextComponent = document.querySelector("#status").textContent;
 
 function connect_socket() {
   socket = new WebSocket("ws://192.168.4.1:80/connect-websocket");
   console.log(socket);
 
   socket.addEventListener("open", (event) => {
-    statusComponent = "Status: Connected";
+    statusTextComponent = "Status: Connected";
   });
 
   socket.addEventListener("close", (event) => {
     socket = undefined;
-    statusComponent = "Status: Disconnected";
+    statusTextComponent = "Status: Disconnected";
   });
 
   socket.addEventListener("message", (event) => {
@@ -222,7 +299,7 @@ function connect_socket() {
 
   socket.addEventListener("error", (event) => {
     socket = undefined;
-    statusComponent = "Status: Disconnected";
+    statusTextComponent = "Status: Disconnected";
   });
 }
 
