@@ -1,7 +1,7 @@
 * {
   font-family: "Gill Sans", sans-serif;
 
-  border: solid 1px red;
+  /* border: solid 1px red; */
 }
 
 #threeCanvas {
@@ -83,8 +83,7 @@ main {
   padding: 0px 20px;
   font-size: 20px;
 }
-/* 
+
 #puckInput {
-  width: 300px;
-  height: 180px;
-} */
+  border: solid 1px black;
+}

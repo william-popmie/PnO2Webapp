@@ -17,21 +17,22 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffffff);
 
 // Set up camera
+
 const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
   0.1,
   50000
 );
-camera.position.set(80, 70, 170);
+camera.position.set(0, 100, 0);
 
 // Miscellaneous
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target = new THREE.Vector3(80, 0, 50);
 // const gridHelper = new THREE.GridHelper(500, 50);
 // scene.add(gridHelper);
-// const axesHelper = new THREE.AxesHelper(2);
-// scene.add(axesHelper);
+const axesHelper = new THREE.AxesHelper(30);
+scene.add(axesHelper);
 
 // Lighting
 const hemiLight = new THREE.HemisphereLight(0xffeeb1, 0x080820, 2);
@@ -43,46 +44,49 @@ spotLight.shadow.mapSize.height = 1024 * 4;
 scene.add(hemiLight, spotLight);
 
 // Grid
-const points = [];
-// Horizontal
-points.push(new THREE.Vector3(0, 0, 0));
-points.push(new THREE.Vector3(150, 0, 0));
-points.push(new THREE.Vector3(150, 0, 30));
-points.push(new THREE.Vector3(0, 0, 30));
-points.push(new THREE.Vector3(0, 0, 60));
-points.push(new THREE.Vector3(150, 0, 60));
-points.push(new THREE.Vector3(150, 0, 90));
-points.push(new THREE.Vector3(0, 0, 90));
-//Vertical
-points.push(new THREE.Vector3(0, 0, 0));
-points.push(new THREE.Vector3(30, 0, 0));
-points.push(new THREE.Vector3(30, 0, 90));
-points.push(new THREE.Vector3(60, 0, 90));
-points.push(new THREE.Vector3(60, 0, 0));
-points.push(new THREE.Vector3(90, 0, 0));
-points.push(new THREE.Vector3(90, 0, 90));
-points.push(new THREE.Vector3(120, 0, 90));
-points.push(new THREE.Vector3(120, 0, 0));
-points.push(new THREE.Vector3(150, 0, 0));
-points.push(new THREE.Vector3(150, 0, 90));
+const vertices = [];
 
-const geometry = new THREE.BufferGeometry().setFromPoints(points);
+vertices.push(0, 0, 0);
+vertices.push(220, 0, 0);
+for (let i = 35; i <= 125; i += 30) {
+  vertices.push(0, 0, i);
+  vertices.push(220, 0, i);
+}
+vertices.push(0, 0, 160);
+vertices.push(220, 0, 160);
+
+vertices.push(0, 0, 0);
+vertices.push(0, 0, 160);
+for (let i = 35; i <= 185; i += 30) {
+  vertices.push(i, 0, 0);
+  vertices.push(i, 0, 160);
+}
+vertices.push(220, 0, 0);
+vertices.push(220, 0, 160);
+
+const geometry = new THREE.BufferGeometry();
+geometry.setAttribute(
+  "position",
+  new THREE.Float32BufferAttribute(vertices, 3)
+);
+
 const material = new THREE.LineBasicMaterial({
   color: 0xffffff,
   linewidth: 100,
 });
-const line = new THREE.Line(geometry, material);
-scene.add(line);
+const grid = new THREE.LineSegments(geometry, material);
+
+scene.add(grid);
 
 // Models Import
-const planeGeometry = new THREE.PlaneGeometry(150 + 60, 90 + 60);
+const planeGeometry = new THREE.PlaneGeometry(220 + 20, 160 + 20);
 const planeMaterial = new THREE.MeshBasicMaterial({
   color: 0x222222,
   side: THREE.DoubleSide,
 });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 plane.rotation.x = -Math.PI / 2;
-plane.position.set(150 / 2, -0.1, 90 / 2);
+plane.position.set(220 / 2, -0.1, 160 / 2);
 scene.add(plane);
 
 const puck = (cords, color) => {
@@ -128,7 +132,7 @@ function AddRandomPucks() {
   }
 }
 
-AddRandomPucks();
+// AddRandomPucks();
 
 // Models
 const gltfLoader = new GLTFLoader();
@@ -136,7 +140,7 @@ const gltfLoader = new GLTFLoader();
 const carMoveSpeed = 0.3;
 const carTurnSpeed = 0.02;
 let carModel;
-let carPos = [0, 0];
+let carPos = [35, 35];
 let carRot = -Math.PI / 2;
 
 let moveDir = [0, 0, 0, 0];
@@ -145,7 +149,7 @@ gltfLoader.load("public/car/scene.gltf", (gltf) => {
   carModel = gltf.scene;
 
   carModel.rotation.y = carRot;
-  carModel.position.set(0, 1.6, 0);
+  carModel.position.set(35, 1.6, 35);
   carModel.scale.set(0.03, 0.03, 0.03);
 
   scene.add(carModel);
@@ -208,48 +212,39 @@ const puckCtx = puckCanvas.getContext("2d");
 
 puckCtx.beginPath();
 
-//Horizontal
-puckCtx.moveTo(60, 0);
-puckCtx.lineTo(60, 180);
-puckCtx.moveTo(120, 0);
-puckCtx.lineTo(120, 180);
-puckCtx.moveTo(180, 0);
-puckCtx.lineTo(180, 180);
-puckCtx.moveTo(240, 0);
-puckCtx.lineTo(240, 180);
+//Vertical Lines
+for (let x = 35; x <= 185; x += 30) {
+  puckCtx.moveTo(x, 0);
+  puckCtx.lineTo(x, 180);
+}
 
-puckCtx.moveTo(0, 60);
-puckCtx.lineTo(300, 60);
-puckCtx.moveTo(0, 120);
-puckCtx.lineTo(300, 120);
-
+// Horizontal Lines
+for (let y = 35; y <= 125; y += 30) {
+  puckCtx.moveTo(0, y);
+  puckCtx.lineTo(220, y);
+}
 puckCtx.stroke();
 
 let xPos, yPos;
+let xSnap, ySnap;
 const r = 4;
 
-function DrawWhite(x, y) {
+function DrawWhite() {
   puckCtx.fillStyle = "#ffffff";
   puckCtx.beginPath();
-  puckCtx.arc(60, 60, r, 0, 2 * Math.PI);
-  puckCtx.arc(120, 60, r, 0, 2 * Math.PI);
-  puckCtx.arc(180, 60, r, 0, 2 * Math.PI);
-  puckCtx.arc(240, 60, r, 0, 2 * Math.PI);
-  puckCtx.fill();
 
-  puckCtx.beginPath();
-  puckCtx.arc(60, 120, r, 0, 2 * Math.PI);
-  puckCtx.arc(120, 120, r, 0, 2 * Math.PI);
-  puckCtx.arc(180, 120, r, 0, 2 * Math.PI);
-  puckCtx.arc(240, 120, r, 0, 2 * Math.PI);
-  puckCtx.fill();
+  for (let x = 35; x <= 185; x += 30) {
+    puckCtx.beginPath();
+    for (let y = 35; y <= 125; y += 30) {
+      puckCtx.arc(x, y, r, 0, 2 * Math.PI);
+    }
+    puckCtx.fill();
+  }
 
   puckCtx.fillStyle = "#ff0000";
   puckCtx.beginPath();
-  puckCtx.arc(x * 2, y * 2, r, 0, 2 * Math.PI);
+  puckCtx.arc(xSnap, ySnap, r, 0, 2 * Math.PI);
   puckCtx.fill();
-
-  console.log(x, y);
 }
 
 DrawWhite();
@@ -264,16 +259,9 @@ puckCanvas.addEventListener("mousedown", (e) => {
   let sideX = 0;
   let sideY = 0;
 
-  if (xPos % 30 > 15) sideX = 1;
-  else sideX = 0;
+  console.log(xPos, yPos);
 
-  if (yPos % 30 > 15) sideY = 1;
-  else sideY = 0;
-
-  const xSnap = xPos - (xPos % 30) + sideX * 30;
-  const ySnap = yPos - (yPos % 30) + sideY * 30;
-
-  DrawWhite(xSnap, ySnap);
+  DrawWhite();
 });
 
 // Server Setup
