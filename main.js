@@ -89,11 +89,15 @@ plane.rotation.x = -Math.PI / 2;
 plane.position.set(220 / 2, -0.1, 160 / 2);
 scene.add(plane);
 
+//Pucks
+const puckList = [];
+
 const puck = (cords, color) => {
   const topPuckGeometry = new THREE.CylinderGeometry(2.5, 2.5, 1.8, 32);
   const bottomPuckGeometry = new THREE.CylinderGeometry(1.5, 1.5, 1.8, 32);
 
   const puckMaterial = new THREE.MeshBasicMaterial({ color: color });
+
   const topPuck = new THREE.Mesh(topPuckGeometry, puckMaterial);
   const bottomPuck = new THREE.Mesh(bottomPuckGeometry, puckMaterial);
 
@@ -101,37 +105,8 @@ const puck = (cords, color) => {
   bottomPuck.position.set(cords[0], cords[1], cords[2]);
 
   scene.add(topPuck, bottomPuck);
+  puckList.push([topPuck, bottomPuck]);
 };
-
-function AddRandomPucks() {
-  const puckPos = [];
-
-  while (puckPos.length < 5) {
-    let randNumsX = Math.floor(Math.random() * 5) * 30;
-    let randNumsY = Math.floor(Math.random() * 4) * 30;
-
-    const coord = [randNumsX, 0, randNumsY];
-
-    let inArray = false;
-
-    const a = JSON.stringify(puckPos);
-    const b = JSON.stringify(coord);
-
-    const c = a.indexOf(b);
-    if (c != -1) {
-      inArray = true;
-    }
-
-    if (!inArray && coord != [0, 0, 0]) {
-      puckPos.push(coord);
-    }
-  }
-
-  for (let i = 0; i < 5; i++) {
-    puck(puckPos[i], 0xff4d4d);
-  }
-}
-
 // AddRandomPucks();
 
 // Models
@@ -227,6 +202,7 @@ puckCtx.stroke();
 
 let xPos, yPos;
 let xSnap, ySnap;
+let prevXSnap, prevYSnap;
 const r = 4;
 
 function DrawWhite() {
@@ -240,28 +216,58 @@ function DrawWhite() {
     }
     puckCtx.fill();
   }
-
-  puckCtx.fillStyle = "#ff0000";
-  puckCtx.beginPath();
-  puckCtx.arc(xSnap, ySnap, r, 0, 2 * Math.PI);
   puckCtx.fill();
 }
 
 DrawWhite();
 
+function UpdatePuckPosition() {
+  puckCtx.fillStyle = "#ffffff";
+  puckCtx.beginPath();
+  puckCtx.arc(prevXSnap, prevYSnap, r, 0, 2 * Math.PI);
+  puckCtx.fill();
+
+  puckCtx.fillStyle = "#ff0000";
+  puckCtx.beginPath();
+  puckCtx.arc(xSnap, ySnap, r, 0, 2 * Math.PI);
+  puckCtx.fill();
+
+  if (puckList.length >= 4) {
+    console.log(puckList.length);
+
+    scene.remove(puckList[0][0]);
+    scene.remove(puckList[0][1]);
+
+    puckList.shift();
+  }
+
+  puck([xSnap, 0, ySnap], 0xff0000);
+
+  scene.add(puckList[0][0], puckList[0][1]);
+
+  // console.log(puckList);
+}
+
 puckCanvas.addEventListener("mousemove", (e) => {
   const rect = puckCanvas.getBoundingClientRect();
-  xPos = Math.round((Math.abs(e.clientX - rect.left) * 150) / rect.width);
-  yPos = Math.round((Math.abs(e.clientY - rect.top) * 90) / rect.height);
+  xPos = Math.round(Math.abs(e.clientX - rect.left));
+  yPos = Math.round(Math.abs(e.clientY - rect.top));
 });
 
 puckCanvas.addEventListener("mousedown", (e) => {
-  let sideX = 0;
-  let sideY = 0;
+  prevXSnap = xSnap;
+  prevYSnap = ySnap;
 
-  console.log(xPos, yPos);
+  const modX = (xPos - 35) % 30;
+  const modY = (yPos - 35) % 30;
 
-  DrawWhite();
+  if (modX >= 15) xSnap = xPos - modX + 30;
+  else xSnap = xPos - modX;
+
+  if (modY >= 15) ySnap = yPos - modY + 30;
+  else ySnap = yPos - modY;
+
+  UpdatePuckPosition();
 });
 
 // Server Setup
