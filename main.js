@@ -42,48 +42,48 @@ spotLight.shadow.mapSize.width = 1024 * 4;
 spotLight.shadow.mapSize.height = 1024 * 4;
 scene.add(hemiLight, spotLight);
 
-// Grid
-const points = [];
-// Horizontal
-points.push(new THREE.Vector3(0, 0, 0));
-points.push(new THREE.Vector3(150, 0, 0));
-points.push(new THREE.Vector3(150, 0, 30));
-points.push(new THREE.Vector3(0, 0, 30));
-points.push(new THREE.Vector3(0, 0, 60));
-points.push(new THREE.Vector3(150, 0, 60));
-points.push(new THREE.Vector3(150, 0, 90));
-points.push(new THREE.Vector3(0, 0, 90));
-//Vertical
-points.push(new THREE.Vector3(0, 0, 0));
-points.push(new THREE.Vector3(30, 0, 0));
-points.push(new THREE.Vector3(30, 0, 90));
-points.push(new THREE.Vector3(60, 0, 90));
-points.push(new THREE.Vector3(60, 0, 0));
-points.push(new THREE.Vector3(90, 0, 0));
-points.push(new THREE.Vector3(90, 0, 90));
-points.push(new THREE.Vector3(120, 0, 90));
-points.push(new THREE.Vector3(120, 0, 0));
-points.push(new THREE.Vector3(150, 0, 0));
-points.push(new THREE.Vector3(150, 0, 90));
+// // Grid
+// const points = [];
+// // Horizontal
+// points.push(new THREE.Vector3(0, 0, 0));
+// points.push(new THREE.Vector3(150, 0, 0));
+// points.push(new THREE.Vector3(150, 0, 30));
+// points.push(new THREE.Vector3(0, 0, 30));
+// points.push(new THREE.Vector3(0, 0, 60));
+// points.push(new THREE.Vector3(150, 0, 60));
+// points.push(new THREE.Vector3(150, 0, 90));
+// points.push(new THREE.Vector3(0, 0, 90));
+// //Vertical
+// points.push(new THREE.Vector3(0, 0, 0));
+// points.push(new THREE.Vector3(30, 0, 0));
+// points.push(new THREE.Vector3(30, 0, 90));
+// points.push(new THREE.Vector3(60, 0, 90));
+// points.push(new THREE.Vector3(60, 0, 0));
+// points.push(new THREE.Vector3(90, 0, 0));
+// points.push(new THREE.Vector3(90, 0, 90));
+// points.push(new THREE.Vector3(120, 0, 90));
+// points.push(new THREE.Vector3(120, 0, 0));
+// points.push(new THREE.Vector3(150, 0, 0));
+// points.push(new THREE.Vector3(150, 0, 90));
 
-const geometry = new THREE.BufferGeometry().setFromPoints(points);
-const material = new THREE.LineBasicMaterial({
-  color: 0xffffff,
-  linewidth: 100,
-});
-const line = new THREE.Line(geometry, material);
-scene.add(line);
+// const geometry = new THREE.BufferGeometry().setFromPoints(points);
+// const material = new THREE.LineBasicMaterial({
+//   color: 0xffffff,
+//   linewidth: 100,
+// });
+// const line = new THREE.Line(geometry, material);
+// scene.add(line);
 
 // Models Import
-const planeGeometry = new THREE.PlaneGeometry(150 + 60, 90 + 60);
-const planeMaterial = new THREE.MeshBasicMaterial({
-  color: 0x222222,
-  side: THREE.DoubleSide,
-});
-const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-plane.rotation.x = -Math.PI / 2;
-plane.position.set(150 / 2, -0.1, 90 / 2);
-scene.add(plane);
+// const planeGeometry = new THREE.PlaneGeometry(150 + 60, 90 + 60);
+// const planeMaterial = new THREE.MeshBasicMaterial({
+//   color: 0x222222,
+//   side: THREE.DoubleSide,
+// });
+// const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+// plane.rotation.x = -Math.PI / 2;
+// plane.position.set(150 / 2, -0.1, 90 / 2);
+// scene.add(plane);
 
 const puck = (cords, color) => {
   const topPuckGeometry = new THREE.CylinderGeometry(2.5, 2.5, 1.8, 32);
@@ -141,15 +141,28 @@ let carRot = -Math.PI / 2;
 
 let moveDir = [0, 0, 0, 0];
 
-gltfLoader.load("public/car/scene.gltf", (gltf) => {
-  carModel = gltf.scene;
+// gltfLoader.load("public/car/scene.gltf", (gltf) => {
+//   carModel = gltf.scene;
 
-  carModel.rotation.y = carRot;
-  carModel.position.set(0, 1.6, 0);
-  carModel.scale.set(0.03, 0.03, 0.03);
+//   carModel.rotation.y = carRot;
+//   carModel.position.set(0, 1.6, 0);
+//   carModel.scale.set(0.03, 0.03, 0.03);
 
-  scene.add(carModel);
-});
+//   scene.add(carModel);
+// });
+
+let island
+
+gltfLoader.load(
+   "/island/IslandWithRiver3.gltf",
+   ( gltf ) => {
+      let scale = 500;
+      island = gltf.scene;
+      island.scale.set (scale,scale,scale);
+      island.position.set ( 10, 10, 10 );
+      scene.add(island)
+  },
+);
 
 function animate() {
   requestAnimationFrame(animate);
