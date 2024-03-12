@@ -201,7 +201,7 @@ buttons.forEach((button) => {
 });
 
 let socket = undefined;
-const statusComponent = document.querySelector("#status").textContent;
+let statusComponent = document.querySelector("#status").textContent;
 
 function connect_socket() {
   socket = new WebSocket("ws://192.168.4.1:80/connect-websocket");
