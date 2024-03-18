@@ -272,7 +272,7 @@ puckCanvas.addEventListener("mousedown", (e) => {
 
 // Server Setup
 let socket = undefined;
-const statusTextComponent = document.querySelector("#status").textContent;
+let statusTextComponent = document.querySelector("#status").textContent;
 
 function connect_socket() {
   socket = new WebSocket("ws://192.168.4.1:80/connect-websocket");
