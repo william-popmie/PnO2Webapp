@@ -232,7 +232,7 @@ function UpdatePuckPosition() {
   puckCtx.arc(xSnap, ySnap, r, 0, 2 * Math.PI);
   puckCtx.fill();
 
-  if (puckList.length >= 4) {
+  if (puckList.length >= 6) {
     console.log(puckList.length);
 
     scene.remove(puckList[0][0]);
@@ -241,7 +241,7 @@ function UpdatePuckPosition() {
     puckList.shift();
   }
 
-  puck([xSnap, 0, ySnap], 0xff0000);
+  puck([xSnap, 0, ySnap], 0xff3636);
 
   scene.add(puckList[0][0], puckList[0][1]);
 
