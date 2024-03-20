@@ -18,9 +18,9 @@
 			"name":"Icosphere.008",
 			"rotation":[
 				0,
-				-0.11080584675073624,
+				0.9921229481697083,
 				0,
-				0.9938420653343201
+				0.12526826560497284
 			],
 			"scale":[
 				1.23732328414917,
@@ -43,6 +43,13 @@
 						"node":0,
 						"path":"translation"
 					}
+				},
+				{
+					"sampler":1,
+					"target":{
+						"node":0,
+						"path":"rotation"
+					}
 				}
 			],
 			"name":"Icosphere.008Action.001",
@@ -51,6 +58,11 @@
 					"input":4,
 					"interpolation":"LINEAR",
 					"output":5
+				},
+				{
+					"input":4,
+					"interpolation":"LINEAR",
+					"output":6
 				}
 			]
 		}
@@ -139,6 +151,12 @@
 			"componentType":5126,
 			"count":802,
 			"type":"VEC3"
+		},
+		{
+			"bufferView":6,
+			"componentType":5126,
+			"count":802,
+			"type":"VEC4"
 		}
 	],
 	"bufferViews":[
@@ -175,11 +193,16 @@
 			"buffer":0,
 			"byteLength":9624,
 			"byteOffset":45396
+		},
+		{
+			"buffer":0,
+			"byteLength":12832,
+			"byteOffset":55020
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":55020,
+			"byteLength":67852,
 			"uri":"Cloud2.bin"
 		}
 	]

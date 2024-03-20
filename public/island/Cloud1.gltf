@@ -16,15 +16,21 @@
 		{
 			"mesh":0,
 			"name":"Cloud2",
+			"rotation":[
+				0,
+				0.6915335655212402,
+				0,
+				0.7223443388938904
+			],
 			"scale":[
 				1.23732328414917,
 				1.23732328414917,
 				1.23732328414917
 			],
 			"translation":[
-				-0.10337802767753601,
+				-0.10337362438440323,
 				0.17623397707939148,
-				-0.0046417731791734695
+				-0.0046499609015882015
 			]
 		}
 	],
@@ -37,6 +43,13 @@
 						"node":0,
 						"path":"translation"
 					}
+				},
+				{
+					"sampler":1,
+					"target":{
+						"node":0,
+						"path":"rotation"
+					}
 				}
 			],
 			"name":"Cloud2Action",
@@ -45,6 +58,11 @@
 					"input":4,
 					"interpolation":"LINEAR",
 					"output":5
+				},
+				{
+					"input":4,
+					"interpolation":"LINEAR",
+					"output":6
 				}
 			]
 		}
@@ -121,10 +139,10 @@
 			"componentType":5126,
 			"count":802,
 			"max":[
-				33.375
+				33.416666666666664
 			],
 			"min":[
-				0
+				0.041666666666666664
 			],
 			"type":"SCALAR"
 		},
@@ -133,6 +151,12 @@
 			"componentType":5126,
 			"count":802,
 			"type":"VEC3"
+		},
+		{
+			"bufferView":6,
+			"componentType":5126,
+			"count":802,
+			"type":"VEC4"
 		}
 	],
 	"bufferViews":[
@@ -169,11 +193,16 @@
 			"buffer":0,
 			"byteLength":9624,
 			"byteOffset":58176
+		},
+		{
+			"buffer":0,
+			"byteLength":12832,
+			"byteOffset":67800
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":67800,
+			"byteLength":80632,
 			"uri":"Cloud1.bin"
 		}
 	]

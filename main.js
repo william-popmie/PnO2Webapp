@@ -115,7 +115,7 @@ gltfLoader.load("/car/Wagen.gltf", (gltf) => {
   carModel = gltf.scene;
 
   carModel.rotation.y = carRot;
-  carModel.position.set(0, 1.6, 0);
+  // carModel.position.set(0, 5, 0);
   carModel.scale.set(0.06, 0.06, 0.06);
 
   scene.add(carModel);
@@ -416,10 +416,11 @@ function animate() {
     grijpArm.quaternion.multiplyQuaternions(grijpArm.quaternion, armQuaternion);
 
   }
+  
   if (carModel && grijpArm) {
-    carModel.position.set(carPos[0], 1.6, carPos[1]);
+    carModel.position.set(carPos[0], 5, carPos[1]);
     carModel.rotation.y = carRot;
-    grijpArm.position.set(carPos[0] + armOffset* Math.cos(carRot), 1.6, carPos[1] - armOffset * Math.sin(carRot))
+    grijpArm.position.set(carPos[0] + armOffset* Math.cos(carRot), 5, carPos[1] - armOffset * Math.sin(carRot))
 
   }
 }
