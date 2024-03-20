@@ -143,7 +143,7 @@ let island
 
 
 gltfLoader.load(
-   "/island/IslandWithRiver6.gltf",
+   "/island/Island.gltf",
    ( gltf ) => {
       let scale = 500;
       island = gltf.scene;
@@ -161,48 +161,122 @@ gltfLoader.load(
   },
 );
 
-// let cloud1
+let cloud1
+let mixerCloud1;
+let clock = new THREE.Clock();
 
-// gltfLoader.load(
-//   "/island/Cloud1.gltf",
-//   ( gltf ) => {
-//      let scale = 500;
-//      cloud1 = gltf.scene;
-//      cloud1.scale.set (scale,scale,scale);
-//      cloud1.position.set( 56.2, 10, 40.5 );
-//      cloud1.traverse((n) => {
-//        if (n.isMesh) {
-//          n.castShadow = true;
-//          n.receiveShadow = true;
-//          if (n.material.map) n.material.map.anistropy = 16;
-//        }
-//      });
-//      const mixer = new THREE.AnimationMixer( gltf );
-//      const clips = gltf.animations;
 
-//       // Update the mixer on each frame
-//      function update () {
-//       mixer.update( deltaSeconds );
-// }
+gltfLoader.load(
+  "/island/Cloud2.gltf",
+  ( gltf ) => {
+     let scale = 500;
+     cloud1 = gltf.scene;
+     cloud1.scale.set (scale,scale,scale);
+     cloud1.position.set( 56.2, 10, 40.5 );
+     cloud1.traverse((n) => {
+       if (n.isMesh) {
+         n.castShadow = true;
+         n.receiveShadow = true;
+         if (n.material.map) n.material.map.anistropy = 16;
+       }
+     });
+     mixerCloud1 = new THREE.AnimationMixer( cloud1 );
+     console.log(mixerCloud1)
+     const clip = gltf.animations[0];
+     const action = mixerCloud1.clipAction(clip);
+     console.log(gltf.animations)
+     action.play();
+  
+     scene.add(cloud1)
+ },
+);
 
-//     //  console.log(gltf.animations)
-//     //  console.log(gltf)
+let minecart1
+let mixerMinecart1;
+let clockMinecart1 = new THREE.Clock();
 
-     
-     
-//      // Play a specific animation
-//      const clip = THREE.AnimationClip.findByName( clips, 'Cloud1Action' );
-//      console.log(clip)
-//      const action = mixer.clipAction( clip );
-//      action.play();
-     
-//     //  Play all animations
-//     //  clips.forEach( function ( clip ) {
-//     //    mixer.clipAction( clip ).play();
-//     //  } );
-//      scene.add(cloud1)
-//  },
-// );
+
+gltfLoader.load(
+  "/island/Minecart1.gltf",
+  ( gltf ) => {
+     let scale = 500;
+     minecart1 = gltf.scene;
+     minecart1.scale.set (scale,scale,scale);
+     minecart1.position.set( 56.2, -8, 40.5 );
+     minecart1.traverse((n) => {
+       if (n.isMesh) {
+         n.castShadow = true;
+         n.receiveShadow = true;
+         if (n.material.map) n.material.map.anistropy = 16;
+       }
+     });
+     mixerMinecart1 = new THREE.AnimationMixer( minecart1 );
+     const clip = gltf.animations[0];
+     const action = mixerMinecart1.clipAction(clip);
+     console.log(gltf.animations)
+     action.play();
+  
+     scene.add(minecart1)
+ },
+);
+
+let minecart2
+let mixerMinecart2;
+let clockMinecart2 = new THREE.Clock();
+
+
+gltfLoader.load(
+  "/island/Minecart2.gltf",
+  ( gltf ) => {
+     let scale = 500;
+     minecart2 = gltf.scene;
+     minecart2.scale.set (scale,scale,scale);
+     minecart2.position.set( 56.2, -8, 40.5 );
+     minecart2.traverse((n) => {
+       if (n.isMesh) {
+         n.castShadow = true;
+         n.receiveShadow = true;
+         if (n.material.map) n.material.map.anistropy = 16;
+       }
+     });
+     mixerMinecart2 = new THREE.AnimationMixer( minecart2 );
+     const clip = gltf.animations[0];
+     const action = mixerMinecart2.clipAction(clip);
+     console.log(gltf.animations)
+     action.play();
+  
+     scene.add(minecart2)
+ },
+);
+
+let minecart3
+let mixerMinecart3;
+let clockMinecart3 = new THREE.Clock();
+
+
+gltfLoader.load(
+  "/island/Minecart3.gltf",
+  ( gltf ) => {
+     let scale = 500;
+     minecart3 = gltf.scene;
+     minecart3.scale.set (scale,scale,scale);
+     minecart3.position.set( 56.2, -8, 40.5 );
+     minecart3.traverse((n) => {
+       if (n.isMesh) {
+         n.castShadow = true;
+         n.receiveShadow = true;
+         if (n.material.map) n.material.map.anistropy = 16;
+       }
+     });
+     mixerMinecart3 = new THREE.AnimationMixer( minecart3 );
+     const clip = gltf.animations[0];
+     const action = mixerMinecart3.clipAction(clip);
+     console.log(gltf.animations)
+     action.play();
+  
+     scene.add(minecart3)
+ },
+);
 
 
 spotLight.position.set(
@@ -215,6 +289,16 @@ function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
   controls.update();
+  if (mixerCloud1) {
+    mixerCloud1.update(clock.getDelta()); // Update animation mixer in the render loop
+  }
+  if (mixerMinecart1) {
+    mixerMinecart1.update(clockMinecart1.getDelta())
+  }if (mixerMinecart2) {
+    mixerMinecart2.update(clockMinecart2.getDelta())
+  }if (mixerMinecart3) {
+    mixerMinecart3.update(clockMinecart3.getDelta())
+  }
   if (moveDir === 1) {
     carPos[0] += Math.cos(carRot) * carMoveSpeed;
     carPos[1] -= Math.sin(carRot) * carMoveSpeed;
@@ -239,7 +323,6 @@ function animate() {
 
   }
   if (carModel && grijpArm) {
-    console.log(armQuaternion )
     carModel.position.set(carPos[0], 1.6, carPos[1]);
     carModel.rotation.y = carRot;
     grijpArm.position.set(carPos[0] + 4* Math.cos(carRot), 1.6, carPos[1] - 4 * Math.sin(carRot))
