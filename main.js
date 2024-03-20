@@ -116,25 +116,21 @@ gltfLoader.load("/car/Wagen.gltf", (gltf) => {
 
   carModel.rotation.y = carRot;
   carModel.position.set(0, 1.6, 0);
-  carModel.scale.set(0.03, 0.03, 0.03);
+  carModel.scale.set(0.06, 0.06, 0.06);
 
   scene.add(carModel);
 });
 
 let grijpArm;
 
-let armRot = {y: -Math.PI / 2, x:0, z:0}
-const myAxis = new THREE.Vector3(0, 0, 1);
 let armQuaternion = new THREE.Quaternion();
-
-
+let armOffset = 8
 
 gltfLoader.load("/car/Grijparm.gltf", (gltf) => {
   grijpArm = gltf.scene;
 
-  grijpArm.rotation.y = carRot + armRot.y;
-  grijpArm.position.set(0, 1.6, 4);
-  grijpArm.scale.set(0.03, 0.03, 0.03);
+  grijpArm.rotation.y = Math.PI
+  grijpArm.scale.set(0.06, 0.06, 0.06);
 
   scene.add(grijpArm);
 });
@@ -163,11 +159,11 @@ gltfLoader.load(
 
 let cloud1
 let mixerCloud1;
-let clock = new THREE.Clock();
+let clockCloud1 = new THREE.Clock();
 
 
 gltfLoader.load(
-  "/island/Cloud2.gltf",
+  "/island/Cloud1.gltf",
   ( gltf ) => {
      let scale = 500;
      cloud1 = gltf.scene;
@@ -188,6 +184,95 @@ gltfLoader.load(
      action.play();
   
      scene.add(cloud1)
+ },
+);
+
+let cloud2
+let mixerCloud2;
+let clockCloud2 = new THREE.Clock();
+
+
+gltfLoader.load(
+  "/island/Cloud2.gltf",
+  ( gltf ) => {
+     let scale = 500;
+     cloud2 = gltf.scene;
+     cloud2.scale.set (scale,scale,scale);
+     cloud2.position.set( 56.2, 10, 40.5 );
+     cloud2.traverse((n) => {
+       if (n.isMesh) {
+         n.castShadow = true;
+         n.receiveShadow = true;
+         if (n.material.map) n.material.map.anistropy = 16;
+       }
+     });
+     mixerCloud2 = new THREE.AnimationMixer( cloud2 );
+     console.log(mixerCloud2)
+     const clip = gltf.animations[0];
+     const action = mixerCloud2.clipAction(clip);
+     console.log(gltf.animations)
+     action.play();
+  
+     scene.add(cloud2)
+ },
+);
+
+let cloud3
+let mixerCloud3;
+let clockCloud3 = new THREE.Clock();
+
+
+gltfLoader.load(
+  "/island/Cloud3.gltf",
+  ( gltf ) => {
+     let scale = 500;
+     cloud3 = gltf.scene;
+     cloud3.scale.set (scale,scale,scale);
+     cloud3.position.set( 56.2, 10, 40.5 );
+     cloud3.traverse((n) => {
+       if (n.isMesh) {
+         n.castShadow = true;
+         n.receiveShadow = true;
+         if (n.material.map) n.material.map.anistropy = 16;
+       }
+     });
+     mixerCloud3 = new THREE.AnimationMixer( cloud3 );
+     console.log(mixerCloud3)
+     const clip = gltf.animations[0];
+     const action = mixerCloud3.clipAction(clip);
+     console.log(gltf.animations)
+     action.play();
+  
+     scene.add(cloud3)
+ },
+);
+let cloud4
+let mixerCloud4;
+let clockCloud4 = new THREE.Clock();
+
+
+gltfLoader.load(
+  "/island/Cloud4.gltf",
+  ( gltf ) => {
+     let scale = 500;
+     cloud4 = gltf.scene;
+     cloud4.scale.set (scale,scale,scale);
+     cloud4.position.set( 56.2, 10, 40.5 );
+     cloud4.traverse((n) => {
+       if (n.isMesh) {
+         n.castShadow = true;
+         n.receiveShadow = true;
+         if (n.material.map) n.material.map.anistropy = 16;
+       }
+     });
+     mixerCloud4 = new THREE.AnimationMixer( cloud4 );
+     console.log(mixerCloud4)
+     const clip = gltf.animations[0];
+     const action = mixerCloud4.clipAction(clip);
+     console.log(gltf.animations)
+     action.play();
+  
+     scene.add(cloud4)
  },
 );
 
@@ -290,7 +375,16 @@ function animate() {
   renderer.render(scene, camera);
   controls.update();
   if (mixerCloud1) {
-    mixerCloud1.update(clock.getDelta()); // Update animation mixer in the render loop
+    mixerCloud1.update(clockCloud1.getDelta()); // Update animation mixer in the render loop
+  }
+  if (mixerCloud2) {
+    mixerCloud2.update(clockCloud2.getDelta()); // Update animation mixer in the render loop
+  }
+  if (mixerCloud3) {
+    mixerCloud3.update(clockCloud3.getDelta()); // Update animation mixer in the render loop
+  }
+  if (mixerCloud4) {
+    mixerCloud4.update(clockCloud4.getDelta()); // Update animation mixer in the render loop
   }
   if (mixerMinecart1) {
     mixerMinecart1.update(clockMinecart1.getDelta())
@@ -325,7 +419,7 @@ function animate() {
   if (carModel && grijpArm) {
     carModel.position.set(carPos[0], 1.6, carPos[1]);
     carModel.rotation.y = carRot;
-    grijpArm.position.set(carPos[0] + 4* Math.cos(carRot), 1.6, carPos[1] - 4 * Math.sin(carRot))
+    grijpArm.position.set(carPos[0] + armOffset* Math.cos(carRot), 1.6, carPos[1] - armOffset * Math.sin(carRot))
 
   }
 }

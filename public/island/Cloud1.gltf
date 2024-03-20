@@ -15,16 +15,16 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"Cloud1",
+			"name":"Cloud2",
 			"scale":[
 				1.23732328414917,
 				1.23732328414917,
 				1.23732328414917
 			],
 			"translation":[
-				-0.10408759862184525,
-				0.22313110530376434,
-				-0.004644077271223068
+				-0.10337802767753601,
+				0.17623397707939148,
+				-0.0046417731791734695
 			]
 		}
 	],
@@ -39,7 +39,7 @@
 					}
 				}
 			],
-			"name":"Cloud1Action",
+			"name":"Cloud2Action",
 			"samplers":[
 				{
 					"input":4,
@@ -119,9 +119,9 @@
 		{
 			"bufferView":4,
 			"componentType":5126,
-			"count":242,
+			"count":802,
 			"max":[
-				10.041666666666666
+				33.375
 			],
 			"min":[
 				0
@@ -131,7 +131,7 @@
 		{
 			"bufferView":5,
 			"componentType":5126,
-			"count":242,
+			"count":802,
 			"type":"VEC3"
 		}
 	],
@@ -162,18 +162,18 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":968,
+			"byteLength":3208,
 			"byteOffset":54968
 		},
 		{
 			"buffer":0,
-			"byteLength":2904,
-			"byteOffset":55936
+			"byteLength":9624,
+			"byteOffset":58176
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":58840,
+			"byteLength":67800,
 			"uri":"Cloud1.bin"
 		}
 	]
