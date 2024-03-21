@@ -3,10 +3,16 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
+// -------------------------------------------------------------------------------------------
+// THREEJS SETUP
+// -------------------------------------------------------------------------------------------
+
+const threeCanvas = document.querySelector("#threeCanvas");
+
 // Add Renderer
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
-  canvas: document.querySelector("#threeCanvas"),
+  canvas: threeCanvas,
 });
 
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -17,7 +23,6 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffffff);
 
 // Set up camera
-
 const camera = new THREE.PerspectiveCamera(
   75,
   window.innerWidth / window.innerHeight,
@@ -78,19 +83,8 @@ const grid = new THREE.LineSegments(geometry, material);
 
 scene.add(grid);
 
-// Models Import
-const planeGeometry = new THREE.PlaneGeometry(220 + 20, 160 + 20);
-const planeMaterial = new THREE.MeshBasicMaterial({
-  color: 0x222222,
-  side: THREE.DoubleSide,
-});
-const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-plane.rotation.x = -Math.PI / 2;
-plane.position.set(220 / 2, -0.1, 160 / 2);
-scene.add(plane);
-
-//Pucks
-const puckList = [];
+// Puck Setup
+let puckList = [];
 
 const puck = (cords, color) => {
   const topPuckGeometry = new THREE.CylinderGeometry(2.5, 2.5, 1.8, 32);
@@ -105,12 +99,24 @@ const puck = (cords, color) => {
   bottomPuck.position.set(cords[0], cords[1], cords[2]);
 
   scene.add(topPuck, bottomPuck);
-  puckList.push([topPuck, bottomPuck]);
 };
-// AddRandomPucks();
 
-// Models
+// Plane
+const planeGeometry = new THREE.PlaneGeometry(220 + 20, 160 + 20);
+const planeMaterial = new THREE.MeshBasicMaterial({
+  color: 0x222222,
+  side: THREE.DoubleSide,
+});
+const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+plane.rotation.x = -Math.PI / 2;
+plane.position.set(220 / 2, -0.1, 160 / 2);
+scene.add(plane);
+
 const gltfLoader = new GLTFLoader();
+
+// -------------------------------------------------------------------------------------------
+// CAR
+// -------------------------------------------------------------------------------------------
 
 const carMoveSpeed = 0.3;
 const carTurnSpeed = 0.02;
@@ -130,11 +136,7 @@ gltfLoader.load("public/car/scene.gltf", (gltf) => {
   scene.add(carModel);
 });
 
-function animate() {
-  requestAnimationFrame(animate);
-  renderer.render(scene, camera);
-  controls.update();
-
+function MoveCar() {
   if (moveDir[0]) {
     carPos[0] += Math.cos(carRot) * carMoveSpeed;
     carPos[1] -= Math.sin(carRot) * carMoveSpeed;
@@ -146,6 +148,18 @@ function animate() {
   } else if (moveDir[3]) {
     carRot -= carTurnSpeed;
   }
+}
+
+// -------------------------------------------------------------------------------------------
+// MAIN ANIMATION LOOP
+// -------------------------------------------------------------------------------------------
+
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+  controls.update();
+
+  MoveCar();
 
   if (carModel) {
     carModel.position.set(carPos[0], 1.6, carPos[1]);
@@ -155,122 +169,84 @@ function animate() {
 
 animate();
 
-// Manual Input
-document.addEventListener("contextmenu", (event) => event.preventDefault());
+// -------------------------------------------------------------------------------------------
+// RAYCASTING
+// -------------------------------------------------------------------------------------------
+const raycaster = new THREE.Raycaster();
 
-const directions = {
-  forward: [1, 0, 0, 0],
-  backward: [0, 1, 0, 0],
-  left: [0, 0, 1, 0],
-  right: [0, 0, 0, 1],
-};
+threeCanvas.addEventListener("pointerdown", (event) => {
+  const coords = new THREE.Vector2(
+    (event.clientX / renderer.domElement.clientWidth) * 2 - 1,
+    -((event.clientY / renderer.domElement.clientHeight) * 2 - 1)
+  );
 
-const buttons = document.querySelectorAll(".inputButton");
-buttons.forEach((button) => {
-  button.addEventListener("mousedown", () => {
-    const direction = directions[button.id];
-    moveDir = direction;
-    SendDir(button.id);
-  });
-});
+  raycaster.setFromCamera(coords, camera);
+  const intersection = raycaster.intersectObject(plane, true);
+  if (intersection.length > 0) {
+    const coord = intersection[0].point;
 
-buttons.forEach((button) => {
-  button.addEventListener("mouseup", () => {
-    moveDir = [0, 0, 0, 0];
-    SendDir("stop");
-  });
-});
+    const diffX = (coord.x - 35) % 30;
+    const diffZ = (coord.z - 35) % 30;
+    let finalX = 0;
+    let finalZ = 0;
 
-// Canvas Input
-const puckCanvas = document.querySelector("#puckInput");
-const puckCtx = puckCanvas.getContext("2d");
+    if (diffX > 35 / 2) finalX = coord.x + (30 - diffX);
+    else finalX = coord.x - diffX;
 
-puckCtx.beginPath();
+    if (diffZ > 35 / 2) finalZ = coord.z + (30 - diffZ);
+    else finalZ = coord.z - diffZ;
 
-//Vertical Lines
-for (let x = 35; x <= 185; x += 30) {
-  puckCtx.moveTo(x, 0);
-  puckCtx.lineTo(x, 180);
-}
+    if (coord.x < 35) finalX = 35;
+    else if (coord.x > 185) finalX = 185;
+    if (coord.z < 35) finalZ = 35;
+    else if (coord.z > 125) finalX = 125;
 
-// Horizontal Lines
-for (let y = 35; y <= 125; y += 30) {
-  puckCtx.moveTo(0, y);
-  puckCtx.lineTo(220, y);
-}
-puckCtx.stroke();
-
-let xPos, yPos;
-let xSnap, ySnap;
-let prevXSnap, prevYSnap;
-const r = 4;
-
-function DrawWhite() {
-  puckCtx.fillStyle = "#ffffff";
-  puckCtx.beginPath();
-
-  for (let x = 35; x <= 185; x += 30) {
-    puckCtx.beginPath();
-    for (let y = 35; y <= 125; y += 30) {
-      puckCtx.arc(x, y, r, 0, 2 * Math.PI);
-    }
-    puckCtx.fill();
+    puck([finalX, coord.y, finalZ], 0xff0000);
   }
-  puckCtx.fill();
-}
-
-DrawWhite();
-
-function UpdatePuckPosition() {
-  puckCtx.fillStyle = "#ffffff";
-  puckCtx.beginPath();
-  puckCtx.arc(prevXSnap, prevYSnap, r, 0, 2 * Math.PI);
-  puckCtx.fill();
-
-  puckCtx.fillStyle = "#ff0000";
-  puckCtx.beginPath();
-  puckCtx.arc(xSnap, ySnap, r, 0, 2 * Math.PI);
-  puckCtx.fill();
-
-  if (puckList.length >= 6) {
-    console.log(puckList.length);
-
-    scene.remove(puckList[0][0]);
-    scene.remove(puckList[0][1]);
-
-    puckList.shift();
-  }
-
-  puck([xSnap, 0, ySnap], 0xff3636);
-
-  scene.add(puckList[0][0], puckList[0][1]);
-
-  // console.log(puckList);
-}
-
-puckCanvas.addEventListener("mousemove", (e) => {
-  const rect = puckCanvas.getBoundingClientRect();
-  xPos = Math.round(Math.abs(e.clientX - rect.left));
-  yPos = Math.round(Math.abs(e.clientY - rect.top));
 });
 
-puckCanvas.addEventListener("mousedown", (e) => {
-  prevXSnap = xSnap;
-  prevYSnap = ySnap;
+// -------------------------------------------------------------------------------------------
+// MANUAL INPUT
+// -------------------------------------------------------------------------------------------
 
-  const modX = (xPos - 35) % 30;
-  const modY = (yPos - 35) % 30;
+// document.addEventListener("contextmenu", (event) => event.preventDefault());
 
-  if (modX >= 15) xSnap = xPos - modX + 30;
-  else xSnap = xPos - modX;
+// let keyPressed = "";
 
-  if (modY >= 15) ySnap = yPos - modY + 30;
-  else ySnap = yPos - modY;
+// document.addEventListener("keydown", (event) => {
+//   console.log("MOVE");
+//   if (event.key == "w" && keyPressed == "") {
+//     moveDir = [1, 0, 0, 0];
+//     keyPressed = "w";
+//     SendDir("forward");
+//   } else if (event.key == "a" && keyPressed == "") {
+//     moveDir = [0, 0, 1, 0];
+//     keyPressed = "a";
+//     SendDir("left");
+//   } else if (event.key == "s" && keyPressed == "") {
+//     moveDir = [0, 1, 0, 0];
+//     keyPressed = "s";
+//     SendDir("back");
+//   } else if (event.key == "d" && keyPressed == "") {
+//     moveDir = [0, 0, 0, 1];
+//     keyPressed = "d";
+//     SendDir("right");
+//   }
+// });
 
-  UpdatePuckPosition();
-});
+// document.addEventListener("keyup", (event) => {
+//   moveDir == [0, 0, 0, 0];
+//   if (event.key == keyPressed) {
+//     keyPressed = "";
+//     SendDir("stop");
+//   }
 
+//   console.log(moveDir);
+// });
+
+// -------------------------------------------------------------------------------------------
 // Server Setup
+// -------------------------------------------------------------------------------------------
 let socket = undefined;
 let statusTextComponent = document.querySelector("#status").textContent;
 
