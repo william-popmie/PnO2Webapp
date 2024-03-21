@@ -243,6 +243,7 @@ let socket = undefined;
 let statusTextComponent =
   document.querySelector("#connectionStatus").textContent;
 
+
 function connect_socket() {
   socket = new WebSocket("ws://192.168.4.1:80/connect-websocket");
   console.log(socket);

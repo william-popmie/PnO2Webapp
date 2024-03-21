@@ -1,12 +1,14 @@
-# Scrollable 3D Animation with Three.js
-
-- Watch the [full tutorial](https://youtu.be/Q7AOvWpIVHU) on YouTube
-- [Scrollable Three.js Animation](https://fireship.io/snippets/threejs-scrollbar-animation) Snippet
+# P&O2 ThreeJS Webapp
 
 ## Usage
 
 ```
-git clone <this-repo>
+git clone https://github.com/william-popmie/PnO2Webapp.git
+```
+```
+cd PnO2Webapp
+```
+```
 npm install
 npm run dev
 ```
