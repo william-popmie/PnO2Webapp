@@ -10,10 +10,32 @@
     <canvas id="threeCanvas"></canvas>
 
     <main>
-      <section class="header">
-        <button class="justabutton" id="connectButton" >Connect</button>
-        <h3 id="status">Status: Disconnected</h3>
+      <section class="connectSection">
+        <button class="connectButton" id="connectButton" >Connect</button>
+        <h3 id="connectionStatus">Status: Disconnected</h3>
       </section>
+      
+
+      <section class="manualInputSection">
+        <div class="pickUp">
+          <button class="inputButton" id="pickUp">Pick Up</button>
+        </div>
+
+        <div class="moveInput">
+          <div id="leftDiv">
+            <button class="inputButton" id="left">Left</button>
+          </div>
+          <div id="forwardBackwardDiv">
+            <button class="inputButton" id="forward">Forward</button>
+            <button class="inputButton" id="backward">Backward</button>
+          </div>
+          <div id="rightDiv">
+            <button class="inputButton" id="right">Right</button>
+          </div>
+        </div>
+      </section>
+
+      
     </main>
 
     <script type="module" src="/main.js"></script>

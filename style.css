@@ -1,7 +1,5 @@
 * {
   font-family: "Gill Sans", sans-serif;
-
-  /* border: solid 1px red; */
 }
 
 #threeCanvas {
@@ -14,18 +12,24 @@ main {
   position: absolute;
 }
 
-.header {
+.connectSection {
   display: flex;
   flex-direction: row;
+  align-items: center;
   margin-bottom: 10px;
 }
 
-.input {
-  display: flex;
-  align-items: center;
+#connectionStatus {
+  margin: 10px;
+  font-size: 25px;
 }
 
-.justabutton,
+#status {
+  padding: 0px 20px;
+  font-size: 20px;
+}
+
+.connectButton,
 .inputButton {
   appearance: none;
   background-color: white;
@@ -54,24 +58,32 @@ main {
   /* width: 100px; */
   will-change: transform;
 }
-
-.justabutton:disabled,
+.connectButton:disabled,
 .inputButton:disabled {
   pointer-events: none;
 }
-
-.justabutton:hover,
+.connectButton:hover,
 .inputButton:hover {
   color: #fff;
   background-color: #1a1a1a;
   box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
   transform: translateY(-2px);
 }
-
-.justabutton:active,
+.connectButton:active,
 .inputButton:active {
   box-shadow: none;
   transform: translateY(0);
+}
+
+.manualInputSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.moveInput {
+  display: flex;
+  align-items: center;
 }
 
 #forwardBackwardDiv {
@@ -79,11 +91,11 @@ main {
   flex-direction: column;
 }
 
-#status {
-  padding: 0px 20px;
-  font-size: 20px;
+#left,
+#right {
+  width: 100px;
 }
 
-#puckInput {
-  border: solid 1px black;
+#pickUp {
+  width: 200px;
 }

@@ -118,8 +118,8 @@ const gltfLoader = new GLTFLoader();
 // CAR
 // -------------------------------------------------------------------------------------------
 
-const carMoveSpeed = 0.3;
-const carTurnSpeed = 0.02;
+const carMoveSpeed = 0.7;
+const carTurnSpeed = 0.05;
 let carModel;
 let carPos = [35, 35];
 let carRot = -Math.PI / 2;
@@ -201,7 +201,7 @@ threeCanvas.addEventListener("pointerdown", (event) => {
     if (coord.z < 35) finalZ = 35;
     else if (coord.z > 125) finalX = 125;
 
-    puck([finalX, coord.y, finalZ], 0xff0000);
+    puck([finalX, 1, finalZ], 0xff4d4d);
   }
 });
 
@@ -209,46 +209,39 @@ threeCanvas.addEventListener("pointerdown", (event) => {
 // MANUAL INPUT
 // -------------------------------------------------------------------------------------------
 
-// document.addEventListener("contextmenu", (event) => event.preventDefault());
+document.addEventListener("contextmenu", (event) => event.preventDefault());
 
-// let keyPressed = "";
+const dirDict = {
+  stop: [0, 0, 0, 0],
+  forward: [1, 0, 0, 0],
+  backward: [0, 1, 0, 0],
+  right: [0, 0, 0, 1],
+  left: [0, 0, 1, 0],
+  pickUp: [0, 0, 0, 0],
+};
 
-// document.addEventListener("keydown", (event) => {
-//   console.log("MOVE");
-//   if (event.key == "w" && keyPressed == "") {
-//     moveDir = [1, 0, 0, 0];
-//     keyPressed = "w";
-//     SendDir("forward");
-//   } else if (event.key == "a" && keyPressed == "") {
-//     moveDir = [0, 0, 1, 0];
-//     keyPressed = "a";
-//     SendDir("left");
-//   } else if (event.key == "s" && keyPressed == "") {
-//     moveDir = [0, 1, 0, 0];
-//     keyPressed = "s";
-//     SendDir("back");
-//   } else if (event.key == "d" && keyPressed == "") {
-//     moveDir = [0, 0, 0, 1];
-//     keyPressed = "d";
-//     SendDir("right");
-//   }
-// });
+const inputButtons = document.querySelectorAll(".inputButton");
 
-// document.addEventListener("keyup", (event) => {
-//   moveDir == [0, 0, 0, 0];
-//   if (event.key == keyPressed) {
-//     keyPressed = "";
-//     SendDir("stop");
-//   }
+inputButtons.forEach((inputButton) => {
+  inputButton.addEventListener("mousedown", (e) => {
+    moveDir = dirDict[e.target.id];
+    SendDir(e.target.id);
+  });
+});
 
-//   console.log(moveDir);
-// });
+inputButtons.forEach((inputButton) => {
+  inputButton.addEventListener("mouseup", (e) => {
+    moveDir = dirDict["stop"];
+    SendDir("stop");
+  });
+});
 
 // -------------------------------------------------------------------------------------------
 // Server Setup
 // -------------------------------------------------------------------------------------------
 let socket = undefined;
-let statusTextComponent = document.querySelector("#status").textContent;
+let statusTextComponent =
+  document.querySelector("#connectionStatus").textContent;
 
 function connect_socket() {
   socket = new WebSocket("ws://192.168.4.1:80/connect-websocket");
