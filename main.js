@@ -3,10 +3,16 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
+// -------------------------------------------------------------------------------------------
+// THREEJS SETUP
+// -------------------------------------------------------------------------------------------
+
+const threeCanvas = document.querySelector("#threeCanvas");
+
 // Add Renderer
 const renderer = new THREE.WebGLRenderer({
   antialias: true,
-  canvas: document.querySelector("#bg"),
+  canvas: threeCanvas,
 });
 
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -23,15 +29,15 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   50000
 );
-camera.position.set(80, 70, 170);
+camera.position.set(0, 100, 0);
 
 // Miscellaneous
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target = new THREE.Vector3(80, 0, 50);
 // const gridHelper = new THREE.GridHelper(500, 50);
 // scene.add(gridHelper);
-// const axesHelper = new THREE.AxesHelper(2);
-// scene.add(axesHelper);
+const axesHelper = new THREE.AxesHelper(30);
+scene.add(axesHelper);
 
 // Lighting
 const hemiLight = new THREE.HemisphereLight(0xffeeb1, 0x080820, 2);
@@ -43,53 +49,49 @@ spotLight.shadow.mapSize.height = 1024 * 4;
 scene.add(hemiLight, spotLight);
 
 // Grid
-const points = [];
-// Horizontal
-points.push(new THREE.Vector3(0, 0, 0));
-points.push(new THREE.Vector3(150, 0, 0));
-points.push(new THREE.Vector3(150, 0, 30));
-points.push(new THREE.Vector3(0, 0, 30));
-points.push(new THREE.Vector3(0, 0, 60));
-points.push(new THREE.Vector3(150, 0, 60));
-points.push(new THREE.Vector3(150, 0, 90));
-points.push(new THREE.Vector3(0, 0, 90));
-//Vertical
-points.push(new THREE.Vector3(0, 0, 0));
-points.push(new THREE.Vector3(30, 0, 0));
-points.push(new THREE.Vector3(30, 0, 90));
-points.push(new THREE.Vector3(60, 0, 90));
-points.push(new THREE.Vector3(60, 0, 0));
-points.push(new THREE.Vector3(90, 0, 0));
-points.push(new THREE.Vector3(90, 0, 90));
-points.push(new THREE.Vector3(120, 0, 90));
-points.push(new THREE.Vector3(120, 0, 0));
-points.push(new THREE.Vector3(150, 0, 0));
-points.push(new THREE.Vector3(150, 0, 90));
+const vertices = [];
 
-const geometry = new THREE.BufferGeometry().setFromPoints(points);
+vertices.push(0, 0, 0);
+vertices.push(220, 0, 0);
+for (let i = 35; i <= 125; i += 30) {
+  vertices.push(0, 0, i);
+  vertices.push(220, 0, i);
+}
+vertices.push(0, 0, 160);
+vertices.push(220, 0, 160);
+
+vertices.push(0, 0, 0);
+vertices.push(0, 0, 160);
+for (let i = 35; i <= 185; i += 30) {
+  vertices.push(i, 0, 0);
+  vertices.push(i, 0, 160);
+}
+vertices.push(220, 0, 0);
+vertices.push(220, 0, 160);
+
+const geometry = new THREE.BufferGeometry();
+geometry.setAttribute(
+  "position",
+  new THREE.Float32BufferAttribute(vertices, 3)
+);
+
 const material = new THREE.LineBasicMaterial({
   color: 0xffffff,
   linewidth: 100,
 });
-const line = new THREE.Line(geometry, material);
-scene.add(line);
+const grid = new THREE.LineSegments(geometry, material);
 
-// Models Import
-const planeGeometry = new THREE.PlaneGeometry(150 + 60, 90 + 60);
-const planeMaterial = new THREE.MeshBasicMaterial({
-  color: 0x222222,
-  side: THREE.DoubleSide,
-});
-const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-plane.rotation.x = -Math.PI / 2;
-plane.position.set(150 / 2, -0.1, 90 / 2);
-scene.add(plane);
+scene.add(grid);
+
+// Puck Setup
+let puckList = [];
 
 const puck = (cords, color) => {
   const topPuckGeometry = new THREE.CylinderGeometry(2.5, 2.5, 1.8, 32);
   const bottomPuckGeometry = new THREE.CylinderGeometry(1.5, 1.5, 1.8, 32);
 
   const puckMaterial = new THREE.MeshBasicMaterial({ color: color });
+
   const topPuck = new THREE.Mesh(topPuckGeometry, puckMaterial);
   const bottomPuck = new THREE.Mesh(bottomPuckGeometry, puckMaterial);
 
@@ -99,44 +101,27 @@ const puck = (cords, color) => {
   scene.add(topPuck, bottomPuck);
 };
 
-function AddRandomPucks() {
-  const puckPos = [];
+// Plane
+const planeGeometry = new THREE.PlaneGeometry(220 + 20, 160 + 20);
+const planeMaterial = new THREE.MeshBasicMaterial({
+  color: 0x222222,
+  side: THREE.DoubleSide,
+});
+const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+plane.rotation.x = -Math.PI / 2;
+plane.position.set(220 / 2, -0.1, 160 / 2);
+scene.add(plane);
 
-  while (puckPos.length < 5) {
-    let randNumsX = Math.floor(Math.random() * 5) * 30;
-    let randNumsY = Math.floor(Math.random() * 4) * 30;
-
-    const coord = [randNumsX, 0, randNumsY];
-
-    let inArray = false;
-
-    const a = JSON.stringify(puckPos);
-    const b = JSON.stringify(coord);
-
-    const c = a.indexOf(b);
-    if (c != -1) {
-      inArray = true;
-    }
-
-    if (!inArray && coord != [0, 0, 0]) {
-      puckPos.push(coord);
-    }
-  }
-
-  for (let i = 0; i < 5; i++) {
-    puck(puckPos[i], 0xff4d4d);
-  }
-}
-
-AddRandomPucks();
-
-// Models
 const gltfLoader = new GLTFLoader();
 
-const carMoveSpeed = 0.3;
-const carTurnSpeed = 0.02;
+// -------------------------------------------------------------------------------------------
+// CAR
+// -------------------------------------------------------------------------------------------
+
+const carMoveSpeed = 0.7;
+const carTurnSpeed = 0.05;
 let carModel;
-let carPos = [0, 0];
+let carPos = [35, 35];
 let carRot = -Math.PI / 2;
 
 let moveDir = [0, 0, 0, 0];
@@ -145,17 +130,13 @@ gltfLoader.load("public/car/scene.gltf", (gltf) => {
   carModel = gltf.scene;
 
   carModel.rotation.y = carRot;
-  carModel.position.set(0, 1.6, 0);
+  carModel.position.set(35, 1.6, 35);
   carModel.scale.set(0.03, 0.03, 0.03);
 
   scene.add(carModel);
 });
 
-function animate() {
-  requestAnimationFrame(animate);
-  renderer.render(scene, camera);
-  controls.update();
-
+function MoveCar() {
   if (moveDir[0]) {
     carPos[0] += Math.cos(carRot) * carMoveSpeed;
     carPos[1] -= Math.sin(carRot) * carMoveSpeed;
@@ -167,6 +148,18 @@ function animate() {
   } else if (moveDir[3]) {
     carRot -= carTurnSpeed;
   }
+}
+
+// -------------------------------------------------------------------------------------------
+// MAIN ANIMATION LOOP
+// -------------------------------------------------------------------------------------------
+
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+  controls.update();
+
+  MoveCar();
 
   if (carModel) {
     carModel.position.set(carPos[0], 1.6, carPos[1]);
@@ -176,44 +169,92 @@ function animate() {
 
 animate();
 
-// INPUT
-const directions = {
+// -------------------------------------------------------------------------------------------
+// RAYCASTING
+// -------------------------------------------------------------------------------------------
+const raycaster = new THREE.Raycaster();
+
+threeCanvas.addEventListener("pointerdown", (event) => {
+  const coords = new THREE.Vector2(
+    (event.clientX / renderer.domElement.clientWidth) * 2 - 1,
+    -((event.clientY / renderer.domElement.clientHeight) * 2 - 1)
+  );
+
+  raycaster.setFromCamera(coords, camera);
+  const intersection = raycaster.intersectObject(plane, true);
+  if (intersection.length > 0) {
+    const coord = intersection[0].point;
+
+    const diffX = (coord.x - 35) % 30;
+    const diffZ = (coord.z - 35) % 30;
+    let finalX = 0;
+    let finalZ = 0;
+
+    if (diffX > 35 / 2) finalX = coord.x + (30 - diffX);
+    else finalX = coord.x - diffX;
+
+    if (diffZ > 35 / 2) finalZ = coord.z + (30 - diffZ);
+    else finalZ = coord.z - diffZ;
+
+    if (coord.x < 35) finalX = 35;
+    else if (coord.x > 185) finalX = 185;
+    if (coord.z < 35) finalZ = 35;
+    else if (coord.z > 125) finalX = 125;
+
+    puck([finalX, 1, finalZ], 0xff4d4d);
+  }
+});
+
+// -------------------------------------------------------------------------------------------
+// MANUAL INPUT
+// -------------------------------------------------------------------------------------------
+
+document.addEventListener("contextmenu", (event) => event.preventDefault());
+
+const dirDict = {
+  stop: [0, 0, 0, 0],
   forward: [1, 0, 0, 0],
   backward: [0, 1, 0, 0],
-  left: [0, 0, 1, 0],
   right: [0, 0, 0, 1],
+  left: [0, 0, 1, 0],
+  pickUp: [0, 0, 0, 0],
 };
 
-const buttons = document.querySelectorAll(".inputButton");
-buttons.forEach((button) => {
-  button.addEventListener("mousedown", () => {
-    const direction = directions[button.id];
-    moveDir = direction;
-    SendDir(button.id);
+const inputButtons = document.querySelectorAll(".inputButton");
+
+inputButtons.forEach((inputButton) => {
+  inputButton.addEventListener("mousedown", (e) => {
+    moveDir = dirDict[e.target.id];
+    SendDir(e.target.id);
   });
 });
 
-buttons.forEach((button) => {
-  button.addEventListener("mouseup", () => {
-    moveDir = [0, 0, 0, 0];
+inputButtons.forEach((inputButton) => {
+  inputButton.addEventListener("mouseup", (e) => {
+    moveDir = dirDict["stop"];
     SendDir("stop");
   });
 });
 
+// -------------------------------------------------------------------------------------------
+// Server Setup
+// -------------------------------------------------------------------------------------------
 let socket = undefined;
-let statusComponent = document.querySelector("#status").textContent;
+let statusTextComponent =
+  document.querySelector("#connectionStatus").textContent;
+
 
 function connect_socket() {
   socket = new WebSocket("ws://192.168.4.1:80/connect-websocket");
   console.log(socket);
 
   socket.addEventListener("open", (event) => {
-    statusComponent = "Status: Connected";
+    statusTextComponent = "Status: Connected";
   });
 
   socket.addEventListener("close", (event) => {
     socket = undefined;
-    statusComponent = "Status: Disconnected";
+    statusTextComponent = "Status: Disconnected";
   });
 
   socket.addEventListener("message", (event) => {
@@ -222,7 +263,7 @@ function connect_socket() {
 
   socket.addEventListener("error", (event) => {
     socket = undefined;
-    statusComponent = "Status: Disconnected";
+    statusTextComponent = "Status: Disconnected";
   });
 }
 
