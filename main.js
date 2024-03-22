@@ -212,7 +212,6 @@ threeCanvas.addEventListener("pointerdown", (event) => {
 document.addEventListener("contextmenu", (event) => event.preventDefault());
 
 const dirDict = {
-  stop: [0, 0, 0, 0],
   forward: [1, 0, 0, 0],
   backward: [0, 1, 0, 0],
   right: [0, 0, 0, 1],
@@ -220,19 +219,30 @@ const dirDict = {
   pickUp: [0, 0, 0, 0],
 };
 
-const inputButtons = document.querySelectorAll(".inputButton");
+const inputButtons = document.querySelectorAll(".manualInputButton");
+const stateButtons = document.querySelectorAll(".stateButton");
 
 inputButtons.forEach((inputButton) => {
   inputButton.addEventListener("mousedown", (e) => {
     moveDir = dirDict[e.target.id];
     SendDir(e.target.id);
   });
+
+  inputButton.addEventListener("mouseup", (e) => {
+    moveDir = [0, 0, 0, 0];
+    SendDir("stop");
+  });
 });
 
-inputButtons.forEach((inputButton) => {
-  inputButton.addEventListener("mouseup", (e) => {
-    moveDir = dirDict["stop"];
-    SendDir("stop");
+stateButtons.forEach((stateButton) => {
+  stateButton.addEventListener("mousedown", (e) => {
+    SendDir(e.target.id);
+    console.log(e.target.id);
+  });
+
+  stateButton.addEventListener("mouseup", (e) => {
+    SendDir(e.target.id + "Release");
+    console.log(e.target.id + "Release");
   });
 });
 
@@ -242,7 +252,6 @@ inputButtons.forEach((inputButton) => {
 let socket = undefined;
 let statusTextComponent =
   document.querySelector("#connectionStatus").textContent;
-
 
 function connect_socket() {
   socket = new WebSocket("ws://192.168.4.1:80/connect-websocket");
