@@ -80,26 +80,7 @@ const material = new THREE.LineBasicMaterial({
   linewidth: 100,
 });
 const grid = new THREE.LineSegments(geometry, material);
-
 scene.add(grid);
-
-// Puck Setup
-let puckList = [];
-
-const puck = (cords, color) => {
-  const topPuckGeometry = new THREE.CylinderGeometry(2.5, 2.5, 1.8, 32);
-  const bottomPuckGeometry = new THREE.CylinderGeometry(1.5, 1.5, 1.8, 32);
-
-  const puckMaterial = new THREE.MeshBasicMaterial({ color: color });
-
-  const topPuck = new THREE.Mesh(topPuckGeometry, puckMaterial);
-  const bottomPuck = new THREE.Mesh(bottomPuckGeometry, puckMaterial);
-
-  topPuck.position.set(cords[0], cords[1] + 1.8, cords[2]);
-  bottomPuck.position.set(cords[0], cords[1], cords[2]);
-
-  scene.add(topPuck, bottomPuck);
-};
 
 // Plane
 const planeGeometry = new THREE.PlaneGeometry(220 + 20, 160 + 20);
@@ -113,6 +94,104 @@ plane.position.set(220 / 2, -0.1, 160 / 2);
 scene.add(plane);
 
 const gltfLoader = new GLTFLoader();
+
+// Puck Setup
+let tempPuck = [];
+let puckList = [];
+
+const puck = (cords, color, opacity) => {
+  const topPuckGeometry = new THREE.CylinderGeometry(2.5, 2.5, 1.8, 32);
+  const bottomPuckGeometry = new THREE.CylinderGeometry(1.5, 1.5, 1.8, 32);
+
+  const puckMaterial = new THREE.MeshBasicMaterial({
+    color: color,
+    transparent: true,
+    opacity: opacity,
+  });
+
+  const topPuck = new THREE.Mesh(topPuckGeometry, puckMaterial);
+  const bottomPuck = new THREE.Mesh(bottomPuckGeometry, puckMaterial);
+
+  topPuck.position.set(cords[0], cords[1] + 1.8, cords[2]);
+  bottomPuck.position.set(cords[0], cords[1], cords[2]);
+
+  tempPuck = [topPuck, bottomPuck];
+  scene.add(tempPuck[0], tempPuck[1]);
+};
+
+// -------------------------------------------------------------------------------------------
+// RAYCASTING
+// -------------------------------------------------------------------------------------------
+const raycaster = new THREE.Raycaster();
+
+let placePuck = false;
+let snapCoords = [];
+
+threeCanvas.addEventListener("pointermove", () => {
+  placePuck = false;
+
+  const coords = new THREE.Vector2(
+    (event.clientX / renderer.domElement.clientWidth) * 2 - 1,
+    -((event.clientY / renderer.domElement.clientHeight) * 2 - 1)
+  );
+
+  raycaster.setFromCamera(coords, camera);
+  const intersection = raycaster.intersectObject(plane, true);
+  if (intersection.length > 0) {
+    const coord = intersection[0].point;
+
+    const diffX = (coord.x - 35) % 30;
+    const diffZ = (coord.z - 35) % 30;
+    let finalX = 0;
+    let finalZ = 0;
+
+    if (diffX > 35 / 2) finalX = coord.x + (30 - diffX);
+    else finalX = coord.x - diffX;
+
+    if (diffZ > 35 / 2) finalZ = coord.z + (30 - diffZ);
+    else finalZ = coord.z - diffZ;
+
+    if (coord.x < 35) finalX = 35;
+    else if (coord.x > 185) finalX = 185;
+    if (coord.z < 35) finalZ = 35;
+    else if (coord.z > 125) finalX = 125;
+
+    snapCoords = [finalX, 1, finalZ];
+    scene.remove(tempPuck[0], tempPuck[1]);
+    puck(snapCoords, 0xff4d4d, 15);
+  }
+});
+
+threeCanvas.addEventListener("pointerdown", (event) => {
+  placePuck = true;
+});
+
+threeCanvas.addEventListener("pointerup", () => {
+  let toRemove = -1;
+  if (placePuck) {
+    // Loop over puckList to find if there already is a puck in that position
+    // If there is: don't place another puck: placepuck = false
+    for (let i = 0; i < puckList.length; i++) {
+      if (
+        snapCoords[0] == puckList[i][0][0] &&
+        snapCoords[1] == puckList[i][0][1] &&
+        snapCoords[2] == puckList[i][0][2]
+      ) {
+        toRemove = i;
+        placePuck = false;
+      }
+    }
+  }
+  if (placePuck) {
+    puckList.push([snapCoords, tempPuck]);
+    puck(snapCoords, 0xff4d4d, 1);
+  } else if (toRemove >= 0) {
+    scene.remove(puckList[toRemove][1][0], puckList[toRemove][1][1]);
+    puckList.splice(toRemove, 1);
+  }
+
+  placePuck = false;
+});
 
 // -------------------------------------------------------------------------------------------
 // CAR
@@ -170,42 +249,6 @@ function animate() {
 animate();
 
 // -------------------------------------------------------------------------------------------
-// RAYCASTING
-// -------------------------------------------------------------------------------------------
-const raycaster = new THREE.Raycaster();
-
-threeCanvas.addEventListener("pointerdown", (event) => {
-  const coords = new THREE.Vector2(
-    (event.clientX / renderer.domElement.clientWidth) * 2 - 1,
-    -((event.clientY / renderer.domElement.clientHeight) * 2 - 1)
-  );
-
-  raycaster.setFromCamera(coords, camera);
-  const intersection = raycaster.intersectObject(plane, true);
-  if (intersection.length > 0) {
-    const coord = intersection[0].point;
-
-    const diffX = (coord.x - 35) % 30;
-    const diffZ = (coord.z - 35) % 30;
-    let finalX = 0;
-    let finalZ = 0;
-
-    if (diffX > 35 / 2) finalX = coord.x + (30 - diffX);
-    else finalX = coord.x - diffX;
-
-    if (diffZ > 35 / 2) finalZ = coord.z + (30 - diffZ);
-    else finalZ = coord.z - diffZ;
-
-    if (coord.x < 35) finalX = 35;
-    else if (coord.x > 185) finalX = 185;
-    if (coord.z < 35) finalZ = 35;
-    else if (coord.z > 125) finalX = 125;
-
-    puck([finalX, 1, finalZ], 0xff4d4d);
-  }
-});
-
-// -------------------------------------------------------------------------------------------
 // MANUAL INPUT
 // -------------------------------------------------------------------------------------------
 
@@ -249,6 +292,7 @@ stateButtons.forEach((stateButton) => {
 // -------------------------------------------------------------------------------------------
 // Server Setup
 // -------------------------------------------------------------------------------------------
+
 let socket = undefined;
 let statusTextComponent =
   document.querySelector("#connectionStatus").textContent;
