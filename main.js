@@ -17,10 +17,13 @@ const renderer = new THREE.WebGLRenderer({
 
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.8;
+renderer.shadowMap.enabled = true;
 
 // Initialize scene
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xffffff);
+scene.background = new THREE.Color(0xc9f0ff);
 
 // Set up camera
 const camera = new THREE.PerspectiveCamera(
@@ -29,90 +32,114 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   50000
 );
-camera.position.set(0, 100, 0);
+camera.position.set(-200, 250, -200);
 
 // Miscellaneous
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.target = new THREE.Vector3(80, 0, 50);
+controls.target = new THREE.Vector3(100, 0, 80);
 // const gridHelper = new THREE.GridHelper(500, 50);
 // scene.add(gridHelper);
 const axesHelper = new THREE.AxesHelper(30);
 scene.add(axesHelper);
 
+// -------------------------------------------------------------------------------------------
+// THREEJS SETUP
+// -------------------------------------------------------------------------------------------
+
 // Lighting
-const hemiLight = new THREE.HemisphereLight(0xffeeb1, 0x080820, 2);
-const spotLight = new THREE.SpotLight(0xffa95c, 4);
-spotLight.castShadow = true;
-spotLight.shadow.bias = -0.0001;
-spotLight.shadow.mapSize.width = 1024 * 4;
-spotLight.shadow.mapSize.height = 1024 * 4;
-scene.add(hemiLight, spotLight);
+const hemiLight = new THREE.HemisphereLight(0xffeeb1, 0x080820, 3);
+scene.add(hemiLight);
+
+const mainSpotLight = new THREE.SpotLight(0xfff8bf, 4);
+mainSpotLight.position.set(-10, 150, -150);
+mainSpotLight.castShadow = true;
+mainSpotLight.shadow.bias = -0.0001;
+mainSpotLight.shadow.mapSize.width = 1024 * 4;
+mainSpotLight.shadow.mapSize.height = 1024 * 4;
+scene.add(mainSpotLight);
+
+const rearLight = new THREE.DirectionalLight(0xc1bfff, 1);
+rearLight.position.set(10, 150, -150);
+rearLight.shadow.bias = -0.0001;
+rearLight.shadow.mapSize.width = 1024 * 4;
+rearLight.shadow.mapSize.height = 1024 * 4;
+scene.add(rearLight);
+
+const directionalLight = new THREE.DirectionalLight(0xb3b5ff, 0.2);
+directionalLight.position.set(100, -1500, 1500);
+scene.add(directionalLight);
+
+// -------------------------------------------------------------------------------------------
+// REST
+// -------------------------------------------------------------------------------------------
 
 // Grid
-const vertices = [];
+// const vertices = [];
 
-vertices.push(0, 0, 0);
-vertices.push(220, 0, 0);
-for (let i = 35; i <= 125; i += 30) {
-  vertices.push(0, 0, i);
-  vertices.push(220, 0, i);
-}
-vertices.push(0, 0, 160);
-vertices.push(220, 0, 160);
+// vertices.push(0, 0, 0);
+// vertices.push(220, 0, 0);
+// for (let i = 35; i <= 125; i += 30) {
+//   vertices.push(0, 0, i);
+//   vertices.push(220, 0, i);
+// }
+// vertices.push(0, 0, 160);
+// vertices.push(220, 0, 160);
 
-vertices.push(0, 0, 0);
-vertices.push(0, 0, 160);
-for (let i = 35; i <= 185; i += 30) {
-  vertices.push(i, 0, 0);
-  vertices.push(i, 0, 160);
-}
-vertices.push(220, 0, 0);
-vertices.push(220, 0, 160);
+// vertices.push(0, 0, 0);
+// vertices.push(0, 0, 160);
+// for (let i = 35; i <= 185; i += 30) {
+//   vertices.push(i, 0, 0);
+//   vertices.push(i, 0, 160);
+// }
+// vertices.push(220, 0, 0);
+// vertices.push(220, 0, 160);
 
-const geometry = new THREE.BufferGeometry();
-geometry.setAttribute(
-  "position",
-  new THREE.Float32BufferAttribute(vertices, 3)
-);
+// const geometry = new THREE.BufferGeometry();
+// geometry.setAttribute(
+//   "position",
+//   new THREE.Float32BufferAttribute(vertices, 3)
+// );
 
-const material = new THREE.LineBasicMaterial({
-  color: 0xffffff,
-  linewidth: 100,
-});
-const grid = new THREE.LineSegments(geometry, material);
-scene.add(grid);
+// const material = new THREE.LineBasicMaterial({
+//   color: 0x0000ff,
+//   linewidth: 100,
+// });
+// const grid = new THREE.LineSegments(geometry, material);
+// // scene.add(grid);
 
 // Plane
 const planeGeometry = new THREE.PlaneGeometry(220 + 20, 160 + 20);
 const planeMaterial = new THREE.MeshBasicMaterial({
   color: 0x222222,
+  transparent: true,
+  opacity: 0,
   side: THREE.DoubleSide,
 });
 const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 plane.rotation.x = -Math.PI / 2;
-plane.position.set(220 / 2, -0.1, 160 / 2);
+plane.position.set(220 / 2, -0.8, 160 / 2);
 scene.add(plane);
 
 const gltfLoader = new GLTFLoader();
 
 // Puck Setup
+const puckColor = 0xff3333;
 let tempPuck = [];
 let puckList = [];
 
-const puck = (cords, color, opacity) => {
-  const topPuckGeometry = new THREE.CylinderGeometry(2.5, 2.5, 1.8, 32);
-  const bottomPuckGeometry = new THREE.CylinderGeometry(1.5, 1.5, 1.8, 32);
+const puck = (cords, color) => {
+  const topPuckGeometry = new THREE.CylinderGeometry(4, 4, 2.2, 32);
+  const bottomPuckGeometry = new THREE.CylinderGeometry(2.5, 2.5, 2.2, 32);
 
   const puckMaterial = new THREE.MeshBasicMaterial({
     color: color,
-    transparent: true,
-    opacity: opacity,
+    side: THREE.DoubleSide,
   });
 
   const topPuck = new THREE.Mesh(topPuckGeometry, puckMaterial);
   const bottomPuck = new THREE.Mesh(bottomPuckGeometry, puckMaterial);
 
-  topPuck.position.set(cords[0], cords[1] + 1.8, cords[2]);
+  topPuck.position.set(cords[0], cords[1] + 2.2, cords[2]);
   bottomPuck.position.set(cords[0], cords[1], cords[2]);
 
   tempPuck = [topPuck, bottomPuck];
@@ -127,7 +154,7 @@ const raycaster = new THREE.Raycaster();
 let placePuck = false;
 let snapCoords = [];
 
-threeCanvas.addEventListener("pointermove", () => {
+threeCanvas.addEventListener("pointermove", (event) => {
   placePuck = false;
 
   const coords = new THREE.Vector2(
@@ -156,9 +183,9 @@ threeCanvas.addEventListener("pointermove", () => {
     if (coord.z < 35) finalZ = 35;
     else if (coord.z > 125) finalX = 125;
 
-    snapCoords = [finalX, 1, finalZ];
+    snapCoords = [finalX, 0.3, finalZ];
     scene.remove(tempPuck[0], tempPuck[1]);
-    puck(snapCoords, 0xff4d4d, 15);
+    puck(snapCoords, puckColor);
   }
 });
 
@@ -184,7 +211,7 @@ threeCanvas.addEventListener("pointerup", () => {
   }
   if (placePuck) {
     puckList.push([snapCoords, tempPuck]);
-    puck(snapCoords, 0xff4d4d, 1);
+    puck(snapCoords, puckColor);
   } else if (toRemove >= 0) {
     scene.remove(puckList[toRemove][1][0], puckList[toRemove][1][1]);
     puckList.splice(toRemove, 1);
@@ -210,9 +237,28 @@ gltfLoader.load("public/car/scene.gltf", (gltf) => {
 
   carModel.rotation.y = carRot;
   carModel.position.set(35, 1.6, 35);
-  carModel.scale.set(0.03, 0.03, 0.03);
+  carModel.scale.set(0.05, 0.05, 0.05);
+
+  carModel.traverse((n) => {
+    n.castShadow = true;
+    n.receiveShadow = true;
+  });
 
   scene.add(carModel);
+});
+
+gltfLoader.load("public/island/Island.gltf", (gltf) => {
+  const islandModel = gltf.scene;
+  const scale = 951.5;
+  islandModel.position.set(110, -15, 80.4);
+  islandModel.scale.set(scale, scale, scale);
+
+  islandModel.traverse((n) => {
+    n.castShadow = true;
+    n.receiveShadow = true;
+  });
+
+  scene.add(islandModel);
 });
 
 function MoveCar() {
@@ -235,6 +281,7 @@ function MoveCar() {
 
 function animate() {
   requestAnimationFrame(animate);
+
   renderer.render(scene, camera);
   controls.update();
 
