@@ -198,7 +198,7 @@ function GenerateRoute() {
   );
 
   const material = new MeshLineMaterial({
-    color: 0x41e06c,
+    color: 0x0000ff,
     lineWidth: 1,
   });
 
