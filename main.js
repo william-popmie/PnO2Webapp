@@ -111,12 +111,11 @@ let carRot = -Math.PI / 2;
 
 let moveDir = 0;
 
-gltfLoader.load("/car/Wagen.gltf", (gltf) => {
+gltfLoader.load("/car/Wagen001.gltf", (gltf) => {
   carModel = gltf.scene;
 
   carModel.rotation.y = carRot;
-  // carModel.position.set(0, 5, 0);
-  carModel.scale.set(0.06, 0.06, 0.06);
+  carModel.scale.set(0.04, 0.04, 0.04);
 
   scene.add(carModel);
 });
@@ -124,13 +123,13 @@ gltfLoader.load("/car/Wagen.gltf", (gltf) => {
 let grijpArm;
 
 let armQuaternion = new THREE.Quaternion();
-let armOffset = 8
+let armOffset = 8.5
 
-gltfLoader.load("/car/Grijparm.gltf", (gltf) => {
+gltfLoader.load("/car/Grijparm001.gltf", (gltf) => {
   grijpArm = gltf.scene;
 
   grijpArm.rotation.y = Math.PI
-  grijpArm.scale.set(0.06, 0.06, 0.06);
+  grijpArm.scale.set(0.04, 0.04, 0.04);
 
   scene.add(grijpArm);
 });
@@ -451,9 +450,9 @@ function animate() {
   }
   
   if (carModel && grijpArm) {
-    carModel.position.set(carPos[0], 5, carPos[1]);
+    carModel.position.set(carPos[0], 1.6, carPos[1]);
     carModel.rotation.y = carRot;
-    grijpArm.position.set(carPos[0] + armOffset* Math.cos(carRot), 5, carPos[1] - armOffset * Math.sin(carRot))
+    grijpArm.position.set(carPos[0] + armOffset* Math.cos(carRot), 3.5, carPos[1] - armOffset * Math.sin(carRot))
 
   }
 }
