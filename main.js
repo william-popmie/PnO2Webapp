@@ -2,6 +2,7 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { MainSolve } from "./backtracking";
 
 // -------------------------------------------------------------------------------------------
 // THREEJS SETUP
@@ -106,6 +107,8 @@ scene.add(directionalLight);
 // });
 // const grid = new THREE.LineSegments(geometry, material);
 // // scene.add(grid);
+
+// MainSolve();
 
 // Plane
 const planeGeometry = new THREE.PlaneGeometry(220 + 20, 160 + 20);
@@ -247,20 +250,6 @@ gltfLoader.load("public/car/scene.gltf", (gltf) => {
   scene.add(carModel);
 });
 
-gltfLoader.load("public/island/Island.gltf", (gltf) => {
-  const islandModel = gltf.scene;
-  const scale = 951.5;
-  islandModel.position.set(110, -15, 80.4);
-  islandModel.scale.set(scale, scale, scale);
-
-  islandModel.traverse((n) => {
-    n.castShadow = true;
-    n.receiveShadow = true;
-  });
-
-  scene.add(islandModel);
-});
-
 function MoveCar() {
   if (moveDir[0]) {
     carPos[0] += Math.cos(carRot) * carMoveSpeed;
@@ -276,7 +265,203 @@ function MoveCar() {
 }
 
 // -------------------------------------------------------------------------------------------
-// MAIN ANIMATION LOOP
+// ISLAND
+// -------------------------------------------------------------------------------------------
+
+gltfLoader.load("public/island/Island.gltf", (gltf) => {
+  const islandModel = gltf.scene;
+  const scale = 951.5;
+  islandModel.position.set(110, -15, 80.4);
+  islandModel.scale.set(scale, scale, scale);
+
+  islandModel.traverse((n) => {
+    n.castShadow = true;
+    n.receiveShadow = true;
+  });
+
+  scene.add(islandModel);
+});
+
+let cloud1;
+let mixerCloud1;
+let clockCloud1 = new THREE.Clock();
+
+gltfLoader.load("/island/Cloud1.gltf", (gltf) => {
+  let scale = 951.5;
+  cloud1 = gltf.scene;
+  cloud1.scale.set(scale, scale, scale);
+  cloud1.position.set(110, -15, 80.4);
+  cloud1.traverse((n) => {
+    if (n.isMesh) {
+      n.castShadow = true;
+      n.receiveShadow = true;
+      if (n.material.map) n.material.map.anistropy = 16;
+    }
+  });
+  mixerCloud1 = new THREE.AnimationMixer(cloud1);
+  console.log(mixerCloud1);
+  const clip = gltf.animations[0];
+  const action = mixerCloud1.clipAction(clip);
+  console.log(gltf.animations);
+  action.play();
+
+  scene.add(cloud1);
+});
+
+let cloud2;
+let mixerCloud2;
+let clockCloud2 = new THREE.Clock();
+
+gltfLoader.load("/island/Cloud2.gltf", (gltf) => {
+  let scale = 951.5;
+  cloud2 = gltf.scene;
+  cloud2.scale.set(scale, scale, scale);
+  cloud2.position.set(110, -15, 80.4);
+  cloud2.traverse((n) => {
+    if (n.isMesh) {
+      n.castShadow = true;
+      n.receiveShadow = true;
+      if (n.material.map) n.material.map.anistropy = 16;
+    }
+  });
+  mixerCloud2 = new THREE.AnimationMixer(cloud2);
+  console.log(mixerCloud2);
+  const clip = gltf.animations[0];
+  const action = mixerCloud2.clipAction(clip);
+  console.log(gltf.animations);
+  action.play();
+
+  scene.add(cloud2);
+});
+
+let cloud3;
+let mixerCloud3;
+let clockCloud3 = new THREE.Clock();
+
+gltfLoader.load("/island/Cloud3.gltf", (gltf) => {
+  let scale = 951.5;
+  cloud3 = gltf.scene;
+  cloud3.scale.set(scale, scale, scale);
+  cloud3.position.set(110, -15, 80.4);
+  cloud3.traverse((n) => {
+    if (n.isMesh) {
+      n.castShadow = true;
+      n.receiveShadow = true;
+      if (n.material.map) n.material.map.anistropy = 16;
+    }
+  });
+  mixerCloud3 = new THREE.AnimationMixer(cloud3);
+  console.log(mixerCloud3);
+  const clip = gltf.animations[0];
+  const action = mixerCloud3.clipAction(clip);
+  console.log(gltf.animations);
+  action.play();
+
+  scene.add(cloud3);
+});
+let cloud4;
+let mixerCloud4;
+let clockCloud4 = new THREE.Clock();
+
+gltfLoader.load("/island/Cloud4.gltf", (gltf) => {
+  let scale = 500;
+  cloud4 = gltf.scene;
+  cloud4.scale.set(scale, scale, scale);
+  cloud4.position.set(110, -15, 80.4);
+  cloud4.traverse((n) => {
+    if (n.isMesh) {
+      n.castShadow = true;
+      n.receiveShadow = true;
+      if (n.material.map) n.material.map.anistropy = 16;
+    }
+  });
+  mixerCloud4 = new THREE.AnimationMixer(cloud4);
+  console.log(mixerCloud4);
+  const clip = gltf.animations[0];
+  const action = mixerCloud4.clipAction(clip);
+  console.log(gltf.animations);
+  action.play();
+
+  scene.add(cloud4);
+});
+
+let minecart1;
+let mixerMinecart1;
+let clockMinecart1 = new THREE.Clock();
+
+gltfLoader.load("/island/Minecart1.gltf", (gltf) => {
+  let scale = 951.5;
+  minecart1 = gltf.scene;
+  minecart1.scale.set(scale, scale, scale);
+  minecart1.position.set(110, -15, 80.4);
+  minecart1.traverse((n) => {
+    if (n.isMesh) {
+      n.castShadow = true;
+      n.receiveShadow = true;
+      if (n.material.map) n.material.map.anistropy = 16;
+    }
+  });
+  mixerMinecart1 = new THREE.AnimationMixer(minecart1);
+  const clip = gltf.animations[0];
+  const action = mixerMinecart1.clipAction(clip);
+  console.log(gltf.animations);
+  action.play();
+
+  scene.add(minecart1);
+});
+
+let minecart2;
+let mixerMinecart2;
+let clockMinecart2 = new THREE.Clock();
+
+gltfLoader.load("/island/Minecart2.gltf", (gltf) => {
+  let scale = 951.5;
+  minecart2 = gltf.scene;
+  minecart2.scale.set(scale, scale, scale);
+  minecart2.position.set(110, -15, 80.4);
+  minecart2.traverse((n) => {
+    if (n.isMesh) {
+      n.castShadow = true;
+      n.receiveShadow = true;
+      if (n.material.map) n.material.map.anistropy = 16;
+    }
+  });
+  mixerMinecart2 = new THREE.AnimationMixer(minecart2);
+  const clip = gltf.animations[0];
+  const action = mixerMinecart2.clipAction(clip);
+  console.log(gltf.animations);
+  action.play();
+
+  scene.add(minecart2);
+});
+
+let minecart3;
+let mixerMinecart3;
+let clockMinecart3 = new THREE.Clock();
+
+gltfLoader.load("/island/Minecart3.gltf", (gltf) => {
+  let scale = 951.5;
+  minecart3 = gltf.scene;
+  minecart3.scale.set(scale, scale, scale);
+  minecart3.position.set(110, -15, 80.4);
+  minecart3.traverse((n) => {
+    if (n.isMesh) {
+      n.castShadow = true;
+      n.receiveShadow = true;
+      if (n.material.map) n.material.map.anistropy = 16;
+    }
+  });
+  mixerMinecart3 = new THREE.AnimationMixer(minecart3);
+  const clip = gltf.animations[0];
+  const action = mixerMinecart3.clipAction(clip);
+  console.log(gltf.animations);
+  action.play();
+
+  scene.add(minecart3);
+});
+
+// -------------------------------------------------------------------------------------------
+// MAIN LOOP
 // -------------------------------------------------------------------------------------------
 
 function animate() {
@@ -284,6 +469,28 @@ function animate() {
 
   renderer.render(scene, camera);
   controls.update();
+
+  if (mixerCloud1) {
+    mixerCloud1.update(clockCloud1.getDelta()); // Update animation mixer in the render loop
+  }
+  if (mixerCloud2) {
+    mixerCloud2.update(clockCloud2.getDelta()); // Update animation mixer in the render loop
+  }
+  if (mixerCloud3) {
+    mixerCloud3.update(clockCloud3.getDelta()); // Update animation mixer in the render loop
+  }
+  if (mixerCloud4) {
+    mixerCloud4.update(clockCloud4.getDelta()); // Update animation mixer in the render loop
+  }
+  if (mixerMinecart1) {
+    mixerMinecart1.update(clockMinecart1.getDelta());
+  }
+  if (mixerMinecart2) {
+    mixerMinecart2.update(clockMinecart2.getDelta());
+  }
+  if (mixerMinecart3) {
+    mixerMinecart3.update(clockMinecart3.getDelta());
+  }
 
   MoveCar();
 
