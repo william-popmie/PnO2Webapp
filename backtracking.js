@@ -1,10 +1,10 @@
 let n = 6;
 let m = 4;
 let board = [
-  [1, 0, 0, 0, 0, 0],
-  [1, 0, 2, 2, 0, 0],
-  [1, 0, 0, 2, 0, 0],
-  [1, 1, 1, 2, 0, 0],
+  [0, 0, 0, 0, 1, 1],
+  [0, 0, 0, 0, 2, 1],
+  [0, 0, 1, 2, 2, 2],
+  [0, 0, 0, 0, 1, 1],
 ];
 let t = 100;
 let way = [];
@@ -12,7 +12,7 @@ let finalWay = [];
 
 function Solve(board = board, green = 6, cnt = 0, road = [], x = 0, y = 0) {
   let isGreen;
-  if (board[y][x] == 2 || cnt >= 20) {
+  if (board[y][x] == 2 || cnt >= 25 || cnt >= t) {
     return false;
   } else {
     road.push([x, y]);
@@ -30,7 +30,7 @@ function Solve(board = board, green = 6, cnt = 0, road = [], x = 0, y = 0) {
           for (let x of way) {
             finalWay.push(x);
           }
-          console.log(t, way);
+          // console.log(t, way);
         }
       }
     } else {
@@ -82,8 +82,15 @@ function Solve(board = board, green = 6, cnt = 0, road = [], x = 0, y = 0) {
   }
 }
 
-export function MainSolve() {
-  Solve(board);
+export function MainSolve(simplifiedMatrix) {
+  board = simplifiedMatrix;
 
+  n = 6;
+  m = 4;
+  t = 100;
+  way = [];
+  finalWay = [];
+
+  Solve(board);
   return finalWay;
 }

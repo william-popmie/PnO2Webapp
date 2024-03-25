@@ -3,7 +3,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { MainSolve } from "./backtracking";
-import { MeshLine, MeshLineMaterial, MeshLineRaycast } from "three.meshline";
+import { MeshLine, MeshLineMaterial } from "three.meshline";
 
 // -------------------------------------------------------------------------------------------
 // THREEJS SETUP
@@ -76,31 +76,6 @@ scene.add(directionalLight);
 // -------------------------------------------------------------------------------------------
 
 // Grid
-const route = MainSolve();
-
-const vertices = [];
-
-for (let i = 0; i < route.length; i++) {
-  vertices.push(route[i][0] * 30 + 35, 0.1, route[i][1] * 30 + 35);
-  console.log(route[i][0], route[i][1]);
-}
-
-const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
-geometry.setAttribute(
-  "position",
-  new THREE.Float32BufferAttribute(vertices, 3)
-);
-
-const material = new MeshLineMaterial({
-  color: 0x41e06c,
-  lineWidth: 1,
-});
-
-const grid = new MeshLine();
-grid.setGeometry(geometry);
-
-const mesh = new THREE.Mesh(grid, material);
-scene.add(mesh);
 
 // MainSolve();
 
@@ -142,7 +117,7 @@ const puck = (cords) => {
       puckModel;
 
     if (puckColor == "g") {
-      puckModel.children[0].material.color.set((0, 0, 255));
+      puckModel.children[0].material.color.set(new THREE.Color(0x00ff00));
     }
 
     scene.add(puckModel);
@@ -156,6 +131,9 @@ gltfLoader.load("public/puck/puck.gltf", (gltf) => {
   followPuckModel.position.set(-0, -10, -0);
   followPuckModel.scale.set(scale, scale, scale);
 
+  followPuckModel.children[0].material.transparent = true;
+  followPuckModel.children[0].material.opacity = 0.7;
+
   followPuckModel.traverse((n) => {
     n.castShadow = true;
     n.receiveShadow = true;
@@ -163,6 +141,75 @@ gltfLoader.load("public/puck/puck.gltf", (gltf) => {
 
   scene.add(followPuckModel);
 });
+
+// -------------------------------------------------------------------------------------------
+// GENERATE ROUTE
+// -------------------------------------------------------------------------------------------
+
+let routeMesh;
+function GenerateRoute() {
+  if (routeMesh) {
+    console.log("removed Mesh");
+    scene.remove(routeMesh);
+  }
+
+  let redCounter = 0;
+  let greenCounter = 0;
+  let simplifiedMatrix = Array(4)
+    .fill()
+    .map(() => Array(6).fill());
+
+  for (let y = 0; y < puckMatrix.length; y++) {
+    for (let x = 0; x < puckMatrix[0].length; x++) {
+      if (puckMatrix[y][x]) {
+        if (puckMatrix[y][x].children[0].material.color.g == 1) {
+          simplifiedMatrix[y][x] = 1;
+          greenCounter++;
+        } else {
+          simplifiedMatrix[y][x] = 2;
+          redCounter++;
+        }
+      } else {
+        console.log("undefined");
+        simplifiedMatrix[y][x] = 0;
+      }
+    }
+  }
+
+  if (greenCounter != 6 || redCounter != 4) {
+    return false;
+  }
+
+  const route = MainSolve(simplifiedMatrix);
+
+  for (let coords of route) {
+    console.log(coords[0], coords[1]);
+  }
+  const vertices = [];
+
+  for (let i = 0; i < route.length; i++) {
+    vertices.push(route[i][0] * 30 + 35, 0.1, route[i][1] * 30 + 35);
+  }
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
+  geometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(vertices, 3)
+  );
+
+  const material = new MeshLineMaterial({
+    color: 0x41e06c,
+    lineWidth: 1,
+  });
+
+  const grid = new MeshLine();
+  grid.setGeometry(geometry);
+
+  routeMesh = new THREE.Mesh(grid, material);
+
+  console.log("added Mesh");
+  scene.add(routeMesh);
+}
 
 // -------------------------------------------------------------------------------------------
 // RAYCASTING
@@ -205,6 +252,16 @@ threeCanvas.addEventListener("pointermove", (event) => {
 
     if (followPuckModel) {
       followPuckModel.position.set(snapCoords[0], snapCoords[1], snapCoords[2]);
+
+      if (puckColor == "g") {
+        followPuckModel.children[0].material.color.set(
+          new THREE.Color(0x00ff00)
+        );
+      } else {
+        followPuckModel.children[0].material.color.set(
+          new THREE.Color(0xff0000)
+        );
+      }
     }
   }
 });
@@ -501,6 +558,13 @@ animate();
 // MANUAL INPUT
 // -------------------------------------------------------------------------------------------
 
+document.addEventListener("keypress", (event) => {
+  if (event.key == "c") {
+    if (puckColor == "g") puckColor = "r";
+    else puckColor = "g";
+  }
+});
+
 document.addEventListener("contextmenu", (event) => event.preventDefault());
 
 const dirDict = {
@@ -536,6 +600,10 @@ stateButtons.forEach((stateButton) => {
     SendDir(e.target.id + "Release");
     console.log(e.target.id + "Release");
   });
+});
+
+document.querySelector("#generateButton").addEventListener("mousedown", () => {
+  GenerateRoute();
 });
 
 // -------------------------------------------------------------------------------------------
