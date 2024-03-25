@@ -120,7 +120,12 @@ export function MainSolve(simplifiedBoard) {
   way = [];
   finalWay = [];
 
+  console.log("Current board: ");
+
   PrintBoard();
+
+  console.log("Solving board ...");
+
   Solve(board);
 
   return finalWay;

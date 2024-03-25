@@ -149,7 +149,6 @@ gltfLoader.load("public/puck/puck.gltf", (gltf) => {
 let routeMesh;
 function GenerateRoute() {
   if (routeMesh) {
-    console.log("removed Mesh");
     scene.remove(routeMesh);
   }
 
@@ -170,7 +169,6 @@ function GenerateRoute() {
           redCounter++;
         }
       } else {
-        console.log("undefined");
         simplifiedMatrix[y][x] = 0;
       }
     }
@@ -182,9 +180,6 @@ function GenerateRoute() {
 
   const route = MainSolve(simplifiedMatrix);
 
-  for (let coords of route) {
-    console.log(coords[0], coords[1]);
-  }
   const vertices = [];
 
   for (let i = 0; i < route.length; i++) {
@@ -207,7 +202,6 @@ function GenerateRoute() {
 
   routeMesh = new THREE.Mesh(grid, material);
 
-  console.log("added Mesh");
   scene.add(routeMesh);
 }
 
@@ -231,7 +225,6 @@ threeCanvas.addEventListener("pointermove", (event) => {
   const intersection = raycaster.intersectObject(plane, true);
   if (intersection.length > 0) {
     const coord = intersection[0].point;
-    console.log(Math.floor(coord.x), Math.floor(coord.z));
 
     const diffX = (coord.x - 35) % 30;
     const diffZ = (coord.z - 35) % 30;
@@ -583,6 +576,7 @@ inputButtons.forEach((inputButton) => {
   inputButton.addEventListener("mousedown", (e) => {
     moveDir = dirDict[e.target.id];
     SendDir(e.target.id);
+    console.log(e.target.id);
   });
 
   inputButton.addEventListener("mouseup", (e) => {
