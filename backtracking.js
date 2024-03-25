@@ -1,22 +1,16 @@
 let n = 6;
 let m = 4;
 let board = [
-  [0, 0, 0, 0, 1, 1],
-  [0, 0, 0, 0, 0, 1],
-  [1, 2, 0, 2, 0, 0],
-  [0, 2, 1, 2, 1, 0],
+  [1, 0, 0, 0, 0, 0],
+  [1, 0, 2, 2, 0, 0],
+  [1, 0, 0, 2, 0, 0],
+  [1, 1, 1, 2, 0, 0],
 ];
 let t = 100;
 let way = [];
 let finalWay = [];
 
-function PrintBoard() {
-  for (line of board) {
-    console.log(line);
-  }
-}
-
-function Solve(board, green = 6, cnt = 0, road = [], x = 0, y = 0) {
+function Solve(board = board, green = 6, cnt = 0, road = [], x = 0, y = 0) {
   let isGreen;
   if (board[y][x] == 2 || cnt >= 20) {
     return false;
@@ -89,12 +83,7 @@ function Solve(board, green = 6, cnt = 0, road = [], x = 0, y = 0) {
 }
 
 export function MainSolve() {
-  console.log("Current board: ");
-  PrintBoard();
-  console.log("Solving board ...");
   Solve(board);
-  console.log("Solved board: ");
-  console.log(finalWay);
 
   return finalWay;
 }

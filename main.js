@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { MainSolve } from "./backtracking";
+import { MeshLine, MeshLineMaterial, MeshLineRaycast } from "three.meshline";
 
 // -------------------------------------------------------------------------------------------
 // THREEJS SETUP
@@ -75,38 +76,31 @@ scene.add(directionalLight);
 // -------------------------------------------------------------------------------------------
 
 // Grid
-// const vertices = [];
+const route = MainSolve();
 
-// vertices.push(0, 0, 0);
-// vertices.push(220, 0, 0);
-// for (let i = 35; i <= 125; i += 30) {
-//   vertices.push(0, 0, i);
-//   vertices.push(220, 0, i);
-// }
-// vertices.push(0, 0, 160);
-// vertices.push(220, 0, 160);
+const vertices = [];
 
-// vertices.push(0, 0, 0);
-// vertices.push(0, 0, 160);
-// for (let i = 35; i <= 185; i += 30) {
-//   vertices.push(i, 0, 0);
-//   vertices.push(i, 0, 160);
-// }
-// vertices.push(220, 0, 0);
-// vertices.push(220, 0, 160);
+for (let i = 0; i < route.length; i++) {
+  vertices.push(route[i][0] * 30 + 35, 0.1, route[i][1] * 30 + 35);
+  console.log(route[i][0], route[i][1]);
+}
 
-// const geometry = new THREE.BufferGeometry();
-// geometry.setAttribute(
-//   "position",
-//   new THREE.Float32BufferAttribute(vertices, 3)
-// );
+const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
+geometry.setAttribute(
+  "position",
+  new THREE.Float32BufferAttribute(vertices, 3)
+);
 
-// const material = new THREE.LineBasicMaterial({
-//   color: 0x0000ff,
-//   linewidth: 100,
-// });
-// const grid = new THREE.LineSegments(geometry, material);
-// // scene.add(grid);
+const material = new MeshLineMaterial({
+  color: 0x41e06c,
+  lineWidth: 1,
+});
+
+const grid = new MeshLine();
+grid.setGeometry(geometry);
+
+const mesh = new THREE.Mesh(grid, material);
+scene.add(mesh);
 
 // MainSolve();
 
@@ -126,28 +120,49 @@ scene.add(plane);
 const gltfLoader = new GLTFLoader();
 
 // Puck Setup
-const puckColor = 0xff3333;
-let tempPuck = [];
-let puckList = [];
+let puckColor = "g";
+let puckMatrix = Array(4)
+  .fill()
+  .map(() => Array(6).fill());
 
-const puck = (cords, color) => {
-  const topPuckGeometry = new THREE.CylinderGeometry(4, 4, 2.2, 32);
-  const bottomPuckGeometry = new THREE.CylinderGeometry(2.5, 2.5, 2.2, 32);
+const puck = (cords) => {
+  gltfLoader.load("public/puck/puck.gltf", (gltf) => {
+    const puckModel = gltf.scene;
+    const scale = 3;
 
-  const puckMaterial = new THREE.MeshBasicMaterial({
-    color: color,
-    side: THREE.DoubleSide,
+    puckModel.position.set(cords[0], cords[1], cords[2]);
+    puckModel.scale.set(scale, scale, scale);
+
+    puckModel.traverse((n) => {
+      n.castShadow = true;
+      n.receiveShadow = true;
+    });
+
+    puckMatrix[(snapCoords[2] - 35) / 30][(snapCoords[0] - 35) / 30] =
+      puckModel;
+
+    if (puckColor == "g") {
+      puckModel.children[0].material.color.set((0, 0, 255));
+    }
+
+    scene.add(puckModel);
+  });
+};
+
+let followPuckModel;
+gltfLoader.load("public/puck/puck.gltf", (gltf) => {
+  followPuckModel = gltf.scene;
+  const scale = 3;
+  followPuckModel.position.set(-0, -10, -0);
+  followPuckModel.scale.set(scale, scale, scale);
+
+  followPuckModel.traverse((n) => {
+    n.castShadow = true;
+    n.receiveShadow = true;
   });
 
-  const topPuck = new THREE.Mesh(topPuckGeometry, puckMaterial);
-  const bottomPuck = new THREE.Mesh(bottomPuckGeometry, puckMaterial);
-
-  topPuck.position.set(cords[0], cords[1] + 2.2, cords[2]);
-  bottomPuck.position.set(cords[0], cords[1], cords[2]);
-
-  tempPuck = [topPuck, bottomPuck];
-  scene.add(tempPuck[0], tempPuck[1]);
-};
+  scene.add(followPuckModel);
+});
 
 // -------------------------------------------------------------------------------------------
 // RAYCASTING
@@ -186,9 +201,11 @@ threeCanvas.addEventListener("pointermove", (event) => {
     if (coord.z < 35) finalZ = 35;
     else if (coord.z > 125) finalX = 125;
 
-    snapCoords = [finalX, 0.3, finalZ];
-    scene.remove(tempPuck[0], tempPuck[1]);
-    puck(snapCoords, puckColor);
+    snapCoords = [finalX, 0.1, finalZ];
+
+    if (followPuckModel) {
+      followPuckModel.position.set(snapCoords[0], snapCoords[1], snapCoords[2]);
+    }
   }
 });
 
@@ -197,27 +214,16 @@ threeCanvas.addEventListener("pointerdown", (event) => {
 });
 
 threeCanvas.addEventListener("pointerup", () => {
-  let toRemove = -1;
   if (placePuck) {
-    // Loop over puckList to find if there already is a puck in that position
-    // If there is: don't place another puck: placepuck = false
-    for (let i = 0; i < puckList.length; i++) {
-      if (
-        snapCoords[0] == puckList[i][0][0] &&
-        snapCoords[1] == puckList[i][0][1] &&
-        snapCoords[2] == puckList[i][0][2]
-      ) {
-        toRemove = i;
-        placePuck = false;
-      }
+    if (puckMatrix[(snapCoords[2] - 35) / 30][(snapCoords[0] - 35) / 30]) {
+      scene.remove(
+        puckMatrix[(snapCoords[2] - 35) / 30][(snapCoords[0] - 35) / 30]
+      );
+      puckMatrix[(snapCoords[2] - 35) / 30][(snapCoords[0] - 35) / 30] =
+        undefined;
+    } else {
+      puck(snapCoords);
     }
-  }
-  if (placePuck) {
-    puckList.push([snapCoords, tempPuck]);
-    puck(snapCoords, puckColor);
-  } else if (toRemove >= 0) {
-    scene.remove(puckList[toRemove][1][0], puckList[toRemove][1][1]);
-    puckList.splice(toRemove, 1);
   }
 
   placePuck = false;
@@ -299,10 +305,8 @@ gltfLoader.load("/island/Cloud1.gltf", (gltf) => {
     }
   });
   mixerCloud1 = new THREE.AnimationMixer(cloud1);
-  console.log(mixerCloud1);
   const clip = gltf.animations[0];
   const action = mixerCloud1.clipAction(clip);
-  console.log(gltf.animations);
   action.play();
 
   scene.add(cloud1);
@@ -325,10 +329,8 @@ gltfLoader.load("/island/Cloud2.gltf", (gltf) => {
     }
   });
   mixerCloud2 = new THREE.AnimationMixer(cloud2);
-  console.log(mixerCloud2);
   const clip = gltf.animations[0];
   const action = mixerCloud2.clipAction(clip);
-  console.log(gltf.animations);
   action.play();
 
   scene.add(cloud2);
@@ -351,10 +353,8 @@ gltfLoader.load("/island/Cloud3.gltf", (gltf) => {
     }
   });
   mixerCloud3 = new THREE.AnimationMixer(cloud3);
-  console.log(mixerCloud3);
   const clip = gltf.animations[0];
   const action = mixerCloud3.clipAction(clip);
-  console.log(gltf.animations);
   action.play();
 
   scene.add(cloud3);
@@ -364,7 +364,7 @@ let mixerCloud4;
 let clockCloud4 = new THREE.Clock();
 
 gltfLoader.load("/island/Cloud4.gltf", (gltf) => {
-  let scale = 500;
+  let scale = 951.5;
   cloud4 = gltf.scene;
   cloud4.scale.set(scale, scale, scale);
   cloud4.position.set(110, -15, 80.4);
@@ -376,10 +376,8 @@ gltfLoader.load("/island/Cloud4.gltf", (gltf) => {
     }
   });
   mixerCloud4 = new THREE.AnimationMixer(cloud4);
-  console.log(mixerCloud4);
   const clip = gltf.animations[0];
   const action = mixerCloud4.clipAction(clip);
-  console.log(gltf.animations);
   action.play();
 
   scene.add(cloud4);
@@ -404,7 +402,6 @@ gltfLoader.load("/island/Minecart1.gltf", (gltf) => {
   mixerMinecart1 = new THREE.AnimationMixer(minecart1);
   const clip = gltf.animations[0];
   const action = mixerMinecart1.clipAction(clip);
-  console.log(gltf.animations);
   action.play();
 
   scene.add(minecart1);
@@ -429,7 +426,6 @@ gltfLoader.load("/island/Minecart2.gltf", (gltf) => {
   mixerMinecart2 = new THREE.AnimationMixer(minecart2);
   const clip = gltf.animations[0];
   const action = mixerMinecart2.clipAction(clip);
-  console.log(gltf.animations);
   action.play();
 
   scene.add(minecart2);
@@ -454,7 +450,6 @@ gltfLoader.load("/island/Minecart3.gltf", (gltf) => {
   mixerMinecart3 = new THREE.AnimationMixer(minecart3);
   const clip = gltf.animations[0];
   const action = mixerMinecart3.clipAction(clip);
-  console.log(gltf.animations);
   action.play();
 
   scene.add(minecart3);
