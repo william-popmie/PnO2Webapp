@@ -231,6 +231,7 @@ threeCanvas.addEventListener("pointermove", (event) => {
   const intersection = raycaster.intersectObject(plane, true);
   if (intersection.length > 0) {
     const coord = intersection[0].point;
+    console.log(Math.floor(coord.x), Math.floor(coord.z));
 
     const diffX = (coord.x - 35) % 30;
     const diffZ = (coord.z - 35) % 30;
@@ -246,7 +247,7 @@ threeCanvas.addEventListener("pointermove", (event) => {
     if (coord.x < 35) finalX = 35;
     else if (coord.x > 185) finalX = 185;
     if (coord.z < 35) finalZ = 35;
-    else if (coord.z > 125) finalX = 125;
+    else if (coord.z > 125) finalZ = 125;
 
     snapCoords = [finalX, 0.1, finalZ];
 
