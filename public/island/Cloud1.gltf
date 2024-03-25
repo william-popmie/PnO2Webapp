@@ -137,9 +137,9 @@
 		{
 			"bufferView":4,
 			"componentType":5126,
-			"count":802,
+			"count":2404,
 			"max":[
-				33.416666666666664
+				100.16666666666667
 			],
 			"min":[
 				0.041666666666666664
@@ -149,13 +149,13 @@
 		{
 			"bufferView":5,
 			"componentType":5126,
-			"count":802,
+			"count":2404,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":6,
 			"componentType":5126,
-			"count":802,
+			"count":2404,
 			"type":"VEC4"
 		}
 	],
@@ -186,23 +186,23 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":3208,
+			"byteLength":9616,
 			"byteOffset":54968
 		},
 		{
 			"buffer":0,
-			"byteLength":9624,
-			"byteOffset":58176
+			"byteLength":28848,
+			"byteOffset":64584
 		},
 		{
 			"buffer":0,
-			"byteLength":12832,
-			"byteOffset":67800
+			"byteLength":38464,
+			"byteOffset":93432
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":80632,
+			"byteLength":131896,
 			"uri":"Cloud1.bin"
 		}
 	]

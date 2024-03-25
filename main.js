@@ -139,7 +139,7 @@ let island
 
 
 gltfLoader.load(
-   "/island/Island.gltf",
+   "/island/Island2.gltf",
    ( gltf ) => {
       let scale = 500;
       island = gltf.scene;
@@ -155,6 +155,36 @@ gltfLoader.load(
       });
       scene.add(island)
   },
+);
+
+let watermill
+let mixerWatermill;
+let clockWatermill = new THREE.Clock();
+
+
+gltfLoader.load(
+  "/island/WaterMill.gltf",
+  ( gltf ) => {
+     let scale = 500;
+     watermill = gltf.scene;
+     watermill.scale.set (scale,scale,scale);
+     watermill.position.set( 56.2, -8, 40.5 );
+     watermill.traverse((n) => {
+       if (n.isMesh) {
+         n.castShadow = true;
+         n.receiveShadow = true;
+         if (n.material.map) n.material.map.anistropy = 16;
+       }
+     });
+     mixerWatermill = new THREE.AnimationMixer( watermill );
+     console.log(mixerWatermill)
+     const clip = gltf.animations[0];
+     const action = mixerWatermill.clipAction(clip);
+     console.log(gltf.animations)
+     action.play();
+  
+     scene.add(watermill)
+ },
 );
 
 let cloud1
@@ -374,6 +404,9 @@ function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
   controls.update();
+  if (mixerWatermill) {
+    mixerWatermill.update(clockWatermill.getDelta()); // Update animation mixer in the render loop
+  }
   if (mixerCloud1) {
     mixerCloud1.update(clockCloud1.getDelta()); // Update animation mixer in the render loop
   }

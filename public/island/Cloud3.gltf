@@ -18,9 +18,9 @@
 			"name":"Icosphere.018",
 			"rotation":[
 				0,
-				-0.8949809670448303,
+				-0.894985020160675,
 				0,
-				0.44610437750816345
+				0.4460964500904083
 			],
 			"scale":[
 				1.23732328414917,
@@ -28,9 +28,9 @@
 				1.23732328414917
 			],
 			"translation":[
-				0.09669619798660278,
-				0.17443181574344635,
-				0.07258918881416321
+				0.09669248759746552,
+				0.1288091391324997,
+				0.07258941233158112
 			]
 		}
 	],
@@ -137,9 +137,9 @@
 		{
 			"bufferView":4,
 			"componentType":5126,
-			"count":801,
+			"count":2401,
 			"max":[
-				33.333333333333336
+				100
 			],
 			"min":[
 				0
@@ -149,13 +149,13 @@
 		{
 			"bufferView":5,
 			"componentType":5126,
-			"count":801,
+			"count":2401,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":6,
 			"componentType":5126,
-			"count":801,
+			"count":2401,
 			"type":"VEC4"
 		}
 	],
@@ -186,23 +186,23 @@
 		},
 		{
 			"buffer":0,
-			"byteLength":3204,
+			"byteLength":9604,
 			"byteOffset":42188
 		},
 		{
 			"buffer":0,
-			"byteLength":9612,
-			"byteOffset":45392
+			"byteLength":28812,
+			"byteOffset":51792
 		},
 		{
 			"buffer":0,
-			"byteLength":12816,
-			"byteOffset":55004
+			"byteLength":38416,
+			"byteOffset":80604
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":67820,
+			"byteLength":119020,
 			"uri":"Cloud3.bin"
 		}
 	]
