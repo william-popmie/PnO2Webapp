@@ -2,6 +2,7 @@ import "./style.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { degToRad, radToDeg } from "three/src/math/MathUtils";
 
 const SCENE_BACKGROUND_COLOR = 0x94E7FE;
 const CAMERA_FOV = 90;
@@ -124,6 +125,10 @@ let grijpArm;
 
 let armQuaternion = new THREE.Quaternion();
 let armOffset = 8.5
+const originGrijparm = {x: -2, z: 1.5}
+const distanceGrijparm = Math.sqrt(originGrijparm.x ** 2 + originGrijparm.z ** 2)
+const sinGrijparm = originGrijparm.z / distanceGrijparm
+const cosGrijparm = Math.sqrt(1 - sinGrijparm ** 2)
 
 gltfLoader.load("/car/Grijparm001.gltf", (gltf) => {
   grijpArm = gltf.scene;
@@ -176,10 +181,8 @@ gltfLoader.load(
        }
      });
      mixerWatermill = new THREE.AnimationMixer( watermill );
-     console.log(mixerWatermill)
      const clip = gltf.animations[0];
      const action = mixerWatermill.clipAction(clip);
-     console.log(gltf.animations)
      action.play();
   
      scene.add(watermill)
@@ -206,10 +209,8 @@ gltfLoader.load(
        }
      });
      mixerCloud1 = new THREE.AnimationMixer( cloud1 );
-     console.log(mixerCloud1)
      const clip = gltf.animations[0];
      const action = mixerCloud1.clipAction(clip);
-     console.log(gltf.animations)
      action.play();
   
      scene.add(cloud1)
@@ -236,10 +237,8 @@ gltfLoader.load(
        }
      });
      mixerCloud2 = new THREE.AnimationMixer( cloud2 );
-     console.log(mixerCloud2)
      const clip = gltf.animations[0];
      const action = mixerCloud2.clipAction(clip);
-     console.log(gltf.animations)
      action.play();
   
      scene.add(cloud2)
@@ -266,10 +265,8 @@ gltfLoader.load(
        }
      });
      mixerCloud3 = new THREE.AnimationMixer( cloud3 );
-     console.log(mixerCloud3)
      const clip = gltf.animations[0];
      const action = mixerCloud3.clipAction(clip);
-     console.log(gltf.animations)
      action.play();
   
      scene.add(cloud3)
@@ -295,10 +292,8 @@ gltfLoader.load(
        }
      });
      mixerCloud4 = new THREE.AnimationMixer( cloud4 );
-     console.log(mixerCloud4)
      const clip = gltf.animations[0];
      const action = mixerCloud4.clipAction(clip);
-     console.log(gltf.animations)
      action.play();
   
      scene.add(cloud4)
@@ -327,7 +322,6 @@ gltfLoader.load(
      mixerMinecart1 = new THREE.AnimationMixer( minecart1 );
      const clip = gltf.animations[0];
      const action = mixerMinecart1.clipAction(clip);
-     console.log(gltf.animations)
      action.play();
   
      scene.add(minecart1)
@@ -356,7 +350,6 @@ gltfLoader.load(
      mixerMinecart2 = new THREE.AnimationMixer( minecart2 );
      const clip = gltf.animations[0];
      const action = mixerMinecart2.clipAction(clip);
-     console.log(gltf.animations)
      action.play();
   
      scene.add(minecart2)
@@ -385,7 +378,6 @@ gltfLoader.load(
      mixerMinecart3 = new THREE.AnimationMixer( minecart3 );
      const clip = gltf.animations[0];
      const action = mixerMinecart3.clipAction(clip);
-     console.log(gltf.animations)
      action.play();
   
      scene.add(minecart3)
@@ -452,7 +444,11 @@ function animate() {
   if (carModel && grijpArm) {
     carModel.position.set(carPos[0], 1.6, carPos[1]);
     carModel.rotation.y = carRot;
-    grijpArm.position.set(carPos[0] + armOffset* Math.cos(carRot), 3.5, carPos[1] - armOffset * Math.sin(carRot))
+    // console.log(grijpArm.quaternion.y ** 2 + grijpArm.quaternion.z ** 2) y = cos en z = sin
+    // console.log(radToDeg(Math.asin(sinGrijparm)))
+    // console.log(sinGrijparm)
+    grijpArm.position.set(carPos[0] + armOffset * Math.cos(carRot), 3.5 + distanceGrijparm * sinGrijparm - distanceGrijparm * Math.sin(Math.asin(sinGrijparm) + 2 * Math.asin(grijpArm.quaternion.z)), carPos[1] - armOffset * Math.sin(carRot) + distanceGrijparm * cosGrijparm - distanceGrijparm * Math.cos(Math.asin(sinGrijparm) + 2* Math.asin(grijpArm.quaternion.z) ))
+    // grijpArm.position.set(carPos[0], 5, carPos[1] + armOffset - 2)
 
   }
 }
@@ -544,4 +540,18 @@ socketButton.addEventListener("mousedown", () => {
 //   console.log( controls.object.position ); 
 //   console.log(controls.target)
 // });
+
+// {
+//   "_x": 0,
+//   "_y": 0.7071067811865409,
+//   "_z": -0.70710678118654,
+//   "_w": 0
+// }
+
+// {
+//   "_x": 0.4983351440001114,
+//   "_y": 0.5015872832988486,
+//   "_z": -0.49376960781164536,
+//   "_w": 0.5062251039693518
+// }
 
