@@ -439,6 +439,8 @@ function animate() {
     armQuaternion.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 200);
     grijpArm.quaternion.multiplyQuaternions(grijpArm.quaternion, armQuaternion);
 
+  } else if (moveDir === 7) {
+    sendCommand('hey')
   }
   
   if (carModel && grijpArm) {
@@ -463,7 +465,7 @@ const directions = {
   right: 4,
   turnXM: 5,
   turnXP: 6,
-
+  sendInfo: 7
 };
 
 const buttons = document.querySelectorAll(".inputButton");
