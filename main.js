@@ -501,6 +501,18 @@ function connect_socket() {
   });
 
   socket.addEventListener("message", (event) => {
+    if (event.data == "right") {
+      moveDir = 4
+    }
+    else if (event.data == 'left') {
+      moveDir = 5
+    }
+    else if (event.data == 'forward') {
+      moveDir = 1
+    } else if (event.data == 'picked up') {
+      // pucks.remove(fastest_path[0])
+    }
+
     console.log(event.data);
   });
 
