@@ -557,6 +557,12 @@ document.addEventListener("keypress", (event) => {
     if (puckColor == "g") puckColor = "r";
     else puckColor = "g";
   }
+
+  if (event.key == "g") {
+    moveDir = [0, 0, 0, 0];
+    SendDir("neutral");
+    console.log("LWI:EUHF:W");
+  }
 });
 
 document.addEventListener("contextmenu", (event) => event.preventDefault());
@@ -615,11 +621,13 @@ function connect_socket() {
 
   socket.addEventListener("open", (event) => {
     statusTextComponent = "Status: Connected";
+    console.log("Connection Opneded");
   });
 
   socket.addEventListener("close", (event) => {
     socket = undefined;
     statusTextComponent = "Status: Disconnected";
+    console.log("Connection Lost");
   });
 
   socket.addEventListener("message", (event) => {
