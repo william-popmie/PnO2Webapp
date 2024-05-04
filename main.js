@@ -1,4 +1,5 @@
 import "./style.css";
+import "./dpadStyle.css";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
@@ -150,13 +151,12 @@ gltfLoader.load("public/puck/puck.gltf", (gltf) => {
 let routeMesh;
 function GenerateRoute() {
   if (routeMesh) {
-    console.log("removed Mesh");
     scene.remove(routeMesh);
   }
 
   let redCounter = 0;
   let greenCounter = 0;
-  let simplifiedMatrix = Array(4)
+  let board = Array(4)
     .fill()
     .map(() => Array(6).fill());
 
@@ -164,15 +164,14 @@ function GenerateRoute() {
     for (let x = 0; x < puckMatrix[0].length; x++) {
       if (puckMatrix[y][x]) {
         if (puckMatrix[y][x].children[0].material.color.g == 1) {
-          simplifiedMatrix[y][x] = 1;
+          board[y][x] = "G";
           greenCounter++;
         } else {
-          simplifiedMatrix[y][x] = 2;
+          board[y][x] = "R";
           redCounter++;
         }
       } else {
-        console.log("undefined");
-        simplifiedMatrix[y][x] = 0;
+        board[y][x] = " ";
       }
     }
   }
@@ -181,15 +180,12 @@ function GenerateRoute() {
     return false;
   }
 
-  const route = MainSolve(simplifiedMatrix);
+  const route = MainSolve(board);
 
-  for (let coords of route) {
-    console.log(coords[0], coords[1]);
-  }
   const vertices = [];
 
   for (let i = 0; i < route.length; i++) {
-    vertices.push(route[i][0] * 30 + 35, 0.1, route[i][1] * 30 + 35);
+    vertices.push(route[i][1] * 30 + 35, 0.1, route[i][0] * 30 + 35);
   }
 
   const geometry = new THREE.BufferGeometry().setFromPoints(vertices);
@@ -199,7 +195,8 @@ function GenerateRoute() {
   );
 
   const material = new MeshLineMaterial({
-    color: 0x41e06c,
+    // color: 0x41e06c,
+    color: 0x0000ff,
     lineWidth: 1,
   });
 
@@ -208,7 +205,6 @@ function GenerateRoute() {
 
   routeMesh = new THREE.Mesh(grid, material);
 
-  console.log("added Mesh");
   scene.add(routeMesh);
 }
 
@@ -426,43 +422,34 @@ document.querySelector("#generateButton").addEventListener("mousedown", () => {
 // -------------------------------------------------------------------------------------------
 
 let socket = undefined;
-let statusTextComponent =
-  document.querySelector("#connectionStatus").textContent;
+let statusTextComponent = document.querySelector("#connectionStatus");
 
 function connect_socket() {
   socket = new WebSocket("ws://192.168.4.1:80/connect-websocket");
   console.log(socket);
 
   socket.addEventListener("open", (event) => {
-    statusTextComponent = "Status: Connected";
+    statusTextComponent.textContent = "Status: Connected";
   });
 
   socket.addEventListener("close", (event) => {
     socket = undefined;
-    statusTextComponent = "Status: Disconnected";
+    statusTextComponent.textContent = "Status: Disconnected";
   });
 
   socket.addEventListener("message", (event) => {
-    console.log(event.data);
+    console.log("message received from pico: \n", event.data);
   });
 
   socket.addEventListener("error", (event) => {
     socket = undefined;
-    statusTextComponent = "Status: Disconnected";
+    statusTextComponent.textContent = "Status: Disconnected";
   });
 }
 
 function disconnect_socket() {
   if (socket != undefined) {
     socket.close();
-  }
-}
-
-function sendCommand(command) {
-  if (socket != undefined) {
-    socket.send(command);
-  } else {
-    alert("Not connected to the PICO");
   }
 }
 

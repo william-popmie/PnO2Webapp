@@ -73,28 +73,3 @@ button:active {
   box-shadow: none;
   transform: translateY(0);
 }
-
-.manualInputSection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.moveInput {
-  display: flex;
-  align-items: center;
-}
-
-#forwardBackwardDiv {
-  display: flex;
-  flex-direction: column;
-}
-
-#left,
-#right {
-  width: 100px;
-}
-
-#pickUp {
-  width: 200px;
-}
