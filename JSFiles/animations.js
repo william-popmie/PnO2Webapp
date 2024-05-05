@@ -1,3 +1,6 @@
+import * as THREE from "three";
+import { scene, gltfLoader } from "./threeSetup";
+
 let models = [];
 let clocks = [];
 let mixers = [];
@@ -12,7 +15,11 @@ let animationModels = [
   "minecart3",
 ];
 
-export function InitAnimationModels(THREE, scene, gltfLoader) {
+// -------------------------------------------------------------------------------------------
+// ANIMATION INIT LOGIC
+// -------------------------------------------------------------------------------------------
+
+function InitAnimationModels() {
   for (let i = 0; i < animationModels.length; i++) {
     clocks[i] = new THREE.Clock();
 
@@ -39,10 +46,32 @@ export function InitAnimationModels(THREE, scene, gltfLoader) {
   }
 }
 
-export function UpdateAnimationModels() {
+function UpdateAnimationModels() {
   for (let i = 0; i < animationModels.length; i++) {
     if (mixers[i]) {
       mixers[i].update(clocks[i].getDelta()); // Update animation mixer in the render loop
     }
   }
 }
+
+// -------------------------------------------------------------------------------------------
+// INIT ISLAND MODEL
+// -------------------------------------------------------------------------------------------
+
+function InitIslandModel() {
+  gltfLoader.load("public/island/Island.gltf", (gltf) => {
+    const islandModel = gltf.scene;
+    const scale = 951.5;
+    islandModel.position.set(110, -15, 80.4);
+    islandModel.scale.set(scale, scale, scale);
+
+    islandModel.traverse((n) => {
+      n.castShadow = true;
+      n.receiveShadow = true;
+    });
+
+    scene.add(islandModel);
+  });
+}
+
+export { InitIslandModel, InitAnimationModels, UpdateAnimationModels };

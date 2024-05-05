@@ -1,34 +1,6 @@
 const TIMESTRAIGHT = 3;
 const TIMETURN = 4;
 
-const ACCEPT = "accept";
-const ABANDON = "abandon";
-const CONTINUE = "continue";
-
-function initiate_board(nbRows, nbCols) {
-  if (nbCols < 1 || nbRows < 1) {
-    return null;
-  }
-  const field = new Array(nbRows)
-    .fill(null)
-    .map(() => new Array(nbCols).fill(" "));
-  return field;
-}
-
-function putGreen(board, x, y) {
-  if (x < board.length && x >= 0 && y < board[0].length && y >= 0) {
-    board[x][y] = "G";
-  }
-  return board;
-}
-
-function putRed(board, x, y) {
-  if (x < board[0].length && x >= 0 && y < board.length && y >= 0) {
-    board[x][y] = "R";
-  }
-  return board;
-}
-
 function getGreens(board) {
   const greens = new Set();
   for (let i = 0; i < board.length; i++) {
@@ -39,18 +11,6 @@ function getGreens(board) {
     }
   }
   return greens;
-}
-
-function getReds(board) {
-  const reds = new Set();
-  for (let i = 0; i < board.length; i++) {
-    for (let j = 0; j < board[0].length; j++) {
-      if (board[i][j] === "R") {
-        reds.add([i, j]);
-      }
-    }
-  }
-  return reds;
 }
 
 function getLegalNeighbours(board, pos) {
@@ -102,15 +62,6 @@ function calculateTime(route) {
     rotation = newRotation;
   }
   return totalTime;
-}
-
-function makeInstructionfile(route, board) {
-  let fileContent = "";
-  for (const pos of route) {
-    const pick = board[pos[0]][pos[1]] === "G" ? "True" : "False";
-    fileContent += `${pos[0]}, ${pos[1]}, ${pick}\n`;
-  }
-  // Write fileContent to a file named 'instructions.txt'
 }
 
 function fastestRoute(board, start, finish) {
@@ -168,37 +119,8 @@ function collect(board, start, finish) {
   return roads[minTime];
 }
 
-function changeOutput(path) {
-  let way = "route:";
-  let startOrientation = [path[1][0] - path[0][0], path[1][1] - path[0][1]];
-  for (let i = 1; i < path.length; i++) {
-    const newRotation = [
-      path[i][0] - path[i - 1][0],
-      path[i][1] - path[i - 1][1],
-    ];
-    if (
-      newRotation[0] !== startOrientation[0] ||
-      newRotation[1] !== startOrientation[1]
-    ) {
-      const rotation = [
-        (-1) ** startOrientation[0] * (startOrientation[0] + newRotation[0]),
-        startOrientation[1] + newRotation[1],
-      ];
-      if (rotation[0] === rotation[1] && rotation[0] === 0) {
-        way += "LL";
-      } else if (rotation[0] === rotation[1]) {
-        way += "R";
-      } else if (rotation[0] * -1 === rotation[1]) {
-        way += "L";
-      }
-    }
-    way += "F";
-    startOrientation = newRotation;
-  }
-
-  return way;
-}
-
-export function MainSolve(board) {
+function MainSolve(board) {
   return collect(board, [0, 0], [0, 0]);
 }
+
+export { MainSolve };
