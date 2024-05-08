@@ -1,3 +1,5 @@
+import { MoveCarAlongRoute } from "./car";
+
 let socket = undefined;
 let statusTextComponent = document.querySelector("#connectionStatus");
 
@@ -16,6 +18,9 @@ function connect_socket() {
 
   socket.addEventListener("message", (event) => {
     console.log("message received from pico: \n", event.data);
+    if (event.data == "CROSSED JUST NOW") {
+      MoveCarAlongRoute();
+    }
   });
 
   socket.addEventListener("error", (event) => {
@@ -24,18 +29,16 @@ function connect_socket() {
   });
 }
 
-function SendDir(dir) {
+const socketButton = document.querySelector("#connectButton");
+socketButton.addEventListener("mousedown", () => {
+  connect_socket();
+});
+
+export function SendDir(dir) {
   if (socket != undefined) {
+    console.log(dir);
     socket.send(dir);
   } else {
     console.log("Not connected to the PICO");
   }
 }
-
-const socketButton = document.querySelector("#connectButton");
-
-socketButton.addEventListener("mousedown", () => {
-  connect_socket();
-});
-
-export { SendDir };

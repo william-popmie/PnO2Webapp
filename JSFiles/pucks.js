@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { MeshLine, MeshLineMaterial } from "three.meshline";
+import { ResetI } from "./car";
 
 import {
   renderer,
@@ -21,6 +22,9 @@ let followPuckModel;
 let routeMesh;
 let placePuck = false;
 let snapCoords = [];
+
+let instructions = "";
+let route;
 
 // -------------------------------------------------------------------------------------------
 // PUCK VARIABLE
@@ -87,8 +91,12 @@ function GenerateRoute() {
     return false;
   }
 
-  const route = MainSolve(board);
+  route = MainSolve(board);
+  ResetI();
+
   DrawRoute(route);
+
+  RouteInstructions(route);
 }
 
 function FormatPuckMatrix() {
@@ -113,8 +121,6 @@ function FormatPuckMatrix() {
       }
     }
   }
-
-  if (greenCounter != 6 || redCounter != 4) return false;
 
   return board;
 }
@@ -144,6 +150,96 @@ function DrawRoute(route) {
   scene.add(routeMesh);
 }
 
+function RouteInstructions(route) {
+  instructions = "f";
+  function T(t1, t2) {
+    return t1[0] == t2[0] && t1[1] == t2[1];
+  }
+
+  for (let i = 0; i < route.length - 2; i++) {
+    const p0 = route[i];
+    const p1 = route[i + 1];
+    const p2 = route[i + 2];
+
+    const diff1 = [p1[0] - p0[0], p1[1] - p0[1]];
+    const diff2 = [p2[0] - p1[0], p2[1] - p1[1]];
+
+    if (T(diff1, [1, 0])) {
+      if (T(diff2, [1, 0])) {
+        instructions += "f";
+      } else if (T(diff2, [0, 1])) {
+        instructions += "l";
+      } else if (T(diff2, [-1, 0])) {
+        instructions += "b";
+      } else {
+        instructions += "r";
+      }
+    } else if (T(diff1, [0, 1])) {
+      if (T(diff2, [1, 0])) {
+        instructions += "r";
+      } else if (T(diff2, [0, 1])) {
+        instructions += "f";
+      } else if (T(diff2, [-1, 0])) {
+        instructions += "l";
+      } else {
+        instructions += "b";
+      }
+    } else if (T(diff1, [-1, 0])) {
+      if (T(diff2, [1, 0])) {
+        instructions += "b";
+      } else if (T(diff2, [0, 1])) {
+        instructions += "r";
+      } else if (T(diff2, [-1, 0])) {
+        instructions += "f";
+      } else {
+        instructions += "l";
+      }
+    } else {
+      if (T(diff2, [1, 0])) {
+        instructions += "l";
+      } else if (T(diff2, [0, 1])) {
+        instructions += "b";
+      } else if (T(diff2, [-1, 0])) {
+        instructions += "r";
+      } else {
+        instructions += "f";
+      }
+    }
+  }
+
+  instructions += "s";
+  console.log(instructions);
+  return instructions;
+}
+
+function Instructions(route) {
+  const way = "route:";
+  const startOrientation = [
+    route[1][0] - route[0][0],
+    route[1][1] - route[0][1],
+  ];
+  for (let i = 0; i < route.length; i++) {
+    const newRotation = [
+      route[i][0] - route[i - 1][0],
+      route[i][1] - route[i - 1][1],
+    ];
+    if (newRotation !== startOrientation) {
+      const rotation = [
+        (-1) ** startOrientation[0] * (startOrientation[0] + newRotation[0]),
+        startOrientation[1] + newRotation[1],
+      ];
+      if ((rotation[0] === rotation[1]) === 0) {
+        way += "b";
+      } else if (rotation[0] == rotation[1]) {
+        way += "r";
+      } else if (rotation[0] * -1 == rotation[1]) {
+        way += "l";
+      }
+    }
+  }
+  console.log(way);
+  return way;
+}
 // -------------------------------------------------------------------------------------------
 // EVENT LISTENERS
 // -------------------------------------------------------------------------------------------
@@ -221,4 +317,4 @@ document.addEventListener("keypress", (event) => {
   }
 });
 
-export { InitFollowPuckModel, GenerateRoute };
+export { InitFollowPuckModel, GenerateRoute, instructions, route };

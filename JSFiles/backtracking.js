@@ -17,26 +17,22 @@ function getLegalNeighbours(board, pos) {
   const y = pos[0];
   const x = pos[1];
   const newPos = new Set();
-  if (x + 1 < board[0].length) {
-    if (board[y][x + 1] !== "R") {
-      newPos.add([y, x + 1]);
-    }
+  if (x + 1 < board[0].length && board[y][x + 1] !== "R") {
+    newPos.add([y, x + 1]);
   }
-  if (y + 1 < board.length) {
-    if (board[y + 1][x] !== "R") {
-      newPos.add([y + 1, x]);
-    }
+
+  if (y + 1 < board.length && board[y + 1][x] !== "R") {
+    newPos.add([y + 1, x]);
   }
-  if (x - 1 >= 0) {
-    if (board[y][x - 1] !== "R") {
-      newPos.add([y, x - 1]);
-    }
+
+  if (x - 1 >= 0 && board[y][x - 1] !== "R") {
+    newPos.add([y, x - 1]);
   }
-  if (y - 1 >= 0) {
-    if (board[y - 1][x] !== "R") {
-      newPos.add([y - 1, x]);
-    }
+
+  if (y - 1 >= 0 && board[y - 1][x] !== "R") {
+    newPos.add([y - 1, x]);
   }
+
   return newPos;
 }
 

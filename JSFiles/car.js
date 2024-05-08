@@ -1,4 +1,5 @@
 import { gltfLoader, scene } from "./threeSetup";
+import { route } from "./pucks";
 
 const carMoveSpeed = 0.7;
 const carTurnSpeed = 0.05;
@@ -58,6 +59,25 @@ function MoveCar() {
   }
 }
 
+let i = 0;
+function ResetI() {
+  i = 0;
+}
+
+function MoveCarAlongRoute() {
+  console.log(i, route);
+  if (i < route.length) {
+    carPos[0] = route[i][1] * 30 + 35;
+    carPos[1] = route[i][0] * 30 + 35;
+
+    i++;
+  } else {
+    i = 0;
+  }
+
+  UpdateCar();
+}
+
 function UpdateCar() {
   MoveCar();
 
@@ -67,4 +87,11 @@ function UpdateCar() {
   }
 }
 
-export { InitCarModel, UpdateCar, SetMoveDir, dirDict };
+export {
+  InitCarModel,
+  UpdateCar,
+  MoveCarAlongRoute,
+  SetMoveDir,
+  ResetI,
+  dirDict,
+};
