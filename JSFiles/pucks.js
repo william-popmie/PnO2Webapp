@@ -213,7 +213,7 @@ function RouteInstructions(route) {
 }
 
 function Instructions(route) {
-  const way = "route:";
+  let way = "route:";
   const startOrientation = [
     route[1][0] - route[0][0],
     route[1][1] - route[0][1],
