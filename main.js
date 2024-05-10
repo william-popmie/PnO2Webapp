@@ -12,9 +12,11 @@ import {
   UpdateAnimationModels,
 } from "./JSFiles/animations";
 
-import { SendDir } from "./JSFiles/server";
+import { SendDir, UpdateScore } from "./JSFiles/server";
 import { GenerateRoute, instructions } from "./JSFiles/pucks";
 
+let startTime
+var moving = false
 // -------------------------------------------------------------------------------------------
 // INIT WEBAPP
 // -------------------------------------------------------------------------------------------
@@ -40,7 +42,9 @@ function animate() {
   UpdateControls;
 
   UpdateAnimationModels();
+  if (moving) {
   UpdateCar();
+  }
 }
 
 animate();
@@ -78,11 +82,19 @@ document.addEventListener("contextmenu", (event) => event.preventDefault());
 //   // });
 // });
 
-document.querySelector("#route").addEventListener("mousedown", () => {
+document.querySelector("#route").addEventListener("mousedown", () => {  
+  startTime = new Date()
+  startTime = startTime.getTime()
+  UpdateScore(-1)
   console.log(`route${instructions}`);
+  moving = true
   SendDir(`route${instructions}`);
 });
 
 document.querySelector("#generateButton").addEventListener("mousedown", () => {
   GenerateRoute();
 });
+
+export {
+  startTime
+}
