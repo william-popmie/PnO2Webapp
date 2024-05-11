@@ -9,46 +9,44 @@
   <body>
     <canvas id="threeCanvas"></canvas>
 
-    <main>
-      
-      <section class="connectSection">
-        <button class="connectButton" id="connectButton" >Connect</button>
-        <h3 id="connectionStatus">Status: Disconnected</h3>
+    <section class="connectSection">
+      <button class="connectButton" id="connectButton" >Connect</button>
+      <div class="subConnectSection">
         <h3 id="scoreCounter">Score: 0</h3>
-      </section>
+        <h3 id="timer">Time: 5:00</h3>
+      </div>
+      
+
+      <button id="generateButton">Generate Route</button>
+      <button id="runRouteButton">Run Route</button>
+    </section>
       
 
 
-      <section class="manualInputSection">
-        <div class="pickUp">
+    <section class="manualInputSection">
+      <div class="moveInput">
+        <div id="leftDiv">
+          <button class="manualInputButton" id="left">Left</button>
+        </div>
+        <div class="forwardBackwardDiv">
+          <button class="manualInputButton" id="forward">Forward</button>
           <button class="manualInputButton" id="pickUp">Pick Up</button>
+          <button class="manualInputButton" id="backward">Backward</button>
         </div>
-
-        <div class="moveInput">
-          <div id="leftDiv">
-            <button class="manualInputButton" id="left">Left</button>
-          </div>
-          <div id="forwardBackwardDiv">
-            <button class="manualInputButton" id="forward">Forward</button>
-            <button class="manualInputButton" id="backward">Backward</button>
-          </div>
-          <div id="rightDiv">
-            <button class="manualInputButton" id="right">Right</button>
-          </div>
-        </div>
-
-        <div>
-          <button id="generateButton">Generate Route</button>
-        </div>
-
         <div id="rightDiv">
-          <button class="stateButton" id="route">Run Route</button>
+          <button class="manualInputButton" id="right">Right</button>
         </div>
-      </section>
-      
-      
+      </div>
+    </section>
 
-    </main>
+
+    <section class="otherButtons">
+      <div class="speedInTurnContainer">
+        <input type="number" id="lSpeedInTurn">
+        <input type="number" id="rSpeedInTurn">
+        <button id="submitSpeedInTurn">Update Speed</button>
+      </div>
+    </section>
 
     <script type="module" src="/main.js"></script>
 

@@ -95,8 +95,10 @@ function GenerateRoute() {
   ResetI();
 
   DrawRoute(route);
-
   RouteInstructions(route);
+
+  const buttonsmt = (document.querySelector("#runRouteButton").style.display =
+    "block");
 }
 
 function FormatPuckMatrix() {
@@ -212,34 +214,6 @@ function RouteInstructions(route) {
   return instructions;
 }
 
-function Instructions(route) {
-  let way = "route:";
-  const startOrientation = [
-    route[1][0] - route[0][0],
-    route[1][1] - route[0][1],
-  ];
-  for (let i = 0; i < route.length; i++) {
-    const newRotation = [
-      route[i][0] - route[i - 1][0],
-      route[i][1] - route[i - 1][1],
-    ];
-    if (newRotation !== startOrientation) {
-      const rotation = [
-        (-1) ** startOrientation[0] * (startOrientation[0] + newRotation[0]),
-        startOrientation[1] + newRotation[1],
-      ];
-      if ((rotation[0] === rotation[1]) === 0) {
-        way += "b";
-      } else if (rotation[0] == rotation[1]) {
-        way += "r";
-      } else if (rotation[0] * -1 == rotation[1]) {
-        way += "l";
-      }
-    }
-  }
-  console.log(way);
-  return way;
-}
 // -------------------------------------------------------------------------------------------
 // EVENT LISTENERS
 // -------------------------------------------------------------------------------------------
