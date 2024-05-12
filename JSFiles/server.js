@@ -49,7 +49,16 @@ socketButton.addEventListener("mousedown", () => {
 });
 
 // -------------------------------------------------------------------------------------------
-// SCORE
+// STOP BUTTON
+// -------------------------------------------------------------------------------------------
+
+const stopButton = document.querySelector("#stopButton");
+stopButton.addEventListener("mousedown", () => {
+  SendDir("STOP");
+});
+
+// -------------------------------------------------------------------------------------------
+// TURN SPEED
 // -------------------------------------------------------------------------------------------
 
 const updateSpeedInTurnButton = document.querySelector("#submitSpeedInTurn");
@@ -65,6 +74,8 @@ updateSpeedInTurnButton.addEventListener("mousedown", () => {
 
   localStorage.setItem("lSpeedValue", lSpeedValue);
   localStorage.setItem("rSpeedValue", rSpeedValue);
+
+  SendDir(`TurnSpeed:${lSpeedValue}:${rSpeedValue}`);
 });
 
 // -------------------------------------------------------------------------------------------

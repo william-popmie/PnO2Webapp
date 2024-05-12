@@ -38,11 +38,21 @@ main {
   margin: 2px;
 }
 
-#connectionStatus,
-#scoreCounter,
-#timer {
+#connectionStatus {
   margin: 10px;
   font-size: 25px;
+}
+
+#scoreCounter {
+  font-size: 25px;
+  margin: 7px;
+  margin-bottom: 2px;
+}
+
+#timer {
+  font-size: 25px;
+  margin: 7px;
+  margin-top: 2px;
 }
 
 #status {
@@ -89,12 +99,12 @@ main {
 }
 
 .otherButtons {
+  display: flex;
+  flex-direction: row;
+
   position: absolute;
   bottom: 0;
   left: 0;
-
-  display: flex;
-  flex-direction: column;
 
   margin: 10px;
 }

@@ -10,6 +10,7 @@ let newRot = carRot;
 let moveDir = [0, 0, 0, 0];
 let rotation = [0, 1];
 let rotationStep;
+
 const dirDict = {
   forward: [1, 0, 0, 0],
   backward: [0, 1, 0, 0],
@@ -47,33 +48,17 @@ function SetMoveDir(dir) {
 }
 
 function MoveCar() {
-  // carPos[0] += Math.cos(carRot) * carMoveSpeed;
-  // carPos[1] -= Math.sin(carRot) * carMoveSpeed;
-  // console.log(newRot)
   if (Math.abs(carRot - newRot) >= Math.PI / 8) {
     carRot += rotationStep * carTurnSpeed;
     carRot %= 2 * Math.PI;
     while (carRot < 0) {
       carRot += 2 * Math.PI;
     }
-    // console.log(carRot, newRot)
   } else {
     carRot = newRot;
     carPos[0] += Math.cos(carRot) * carMoveSpeed;
     carPos[1] -= Math.sin(carRot) * carMoveSpeed;
   }
-
-  // if (moveDir[0]) {
-  //   carPos[0] += Math.cos(carRot) * carMoveSpeed;
-  //   carPos[1] -= Math.sin(carRot) * carMoveSpeed;
-  // } else if (moveDir[1]) {
-  //   carPos[0] -= Math.cos(carRot) * carMoveSpeed;
-  //   carPos[1] += Math.sin(carRot) * carMoveSpeed;
-  // } else if (moveDir[2]) {
-  //   carRot += carTurnSpeed;
-  // } else if (moveDir[3]) {
-  //   carRot -= carTurnSpeed;
-  // }
 }
 
 let i = 0;
@@ -82,7 +67,6 @@ function ResetI() {
 }
 
 function MoveCarAlongRoute() {
-  // console.log(i, route);
   if (i < route.length - 1) {
     carPos[0] = route[i][1] * 30 + 35;
     carPos[1] = route[i][0] * 30 + 35;
@@ -104,11 +88,6 @@ function MoveCarAlongRoute() {
         : (newRot - carRot) / 10;
   } else {
     i = 0;
-    // let currentTime = new Date();
-    // currentTime = currentTime.getTime();
-    // let differenceTime = (currentTime - startTime) / 60000;
-    // console.log(differenceTime);
-    // UpdateScore(differenceTime < 3 ? (5 - differenceTime) * 180 : 0);
   }
   console.log(i, route.length);
 
@@ -117,8 +96,6 @@ function MoveCarAlongRoute() {
 
 function UpdateCar() {
   if (route && route.length > i + 1) {
-    // console.log(carPos[0] - route[i+1][1] * 30 - 35, carPos[1] - route[i+1][0] * 30 - 35)
-
     if (
       !(
         Math.abs(carPos[0] - route[i + 1][1] * 30 - 35) <= 0.4 &&
@@ -126,7 +103,6 @@ function UpdateCar() {
       )
     ) {
       MoveCar();
-      // console.log(carPos[0],carPos[1])
     }
   }
 

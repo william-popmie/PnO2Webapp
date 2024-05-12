@@ -14,9 +14,7 @@ import {
 import { MainSolve } from "./backtracking";
 
 let puckColor = "g";
-let puckMatrix = Array(4)
-  .fill()
-  .map(() => Array(6).fill());
+let puckMatrix;
 
 let followPuckModel;
 let routeMesh;
@@ -29,7 +27,7 @@ let route;
 // -------------------------------------------------------------------------------------------
 // PUCK VARIABLE
 // -------------------------------------------------------------------------------------------
-const puck = (cords) => {
+const puck = (cords, color) => {
   gltfLoader.load("public/puck/puck.gltf", (gltf) => {
     const puckModel = gltf.scene;
     const scale = 3;
@@ -42,11 +40,12 @@ const puck = (cords) => {
       n.receiveShadow = true;
     });
 
-    puckMatrix[(snapCoords[2] - 35) / 30][(snapCoords[0] - 35) / 30] =
-      puckModel;
+    puckMatrix[(cords[2] - 35) / 30][(cords[0] - 35) / 30] = puckModel;
 
-    if (puckColor == "g") {
+    if (color == "g") {
       puckModel.children[0].material.color.set(new THREE.Color(0x00ff00));
+    } else {
+      puckModel.children[0].material.color.set(new THREE.Color(0xff0000));
     }
 
     scene.add(puckModel);
@@ -56,6 +55,33 @@ const puck = (cords) => {
 // -------------------------------------------------------------------------------------------
 // INIT GHOST PUCK
 // -------------------------------------------------------------------------------------------
+
+AddExistingPucks();
+function AddExistingPucks() {
+  if (JSON.parse(localStorage.getItem("puckMatrix"))) {
+    puckMatrix = JSON.parse(localStorage.getItem("puckMatrix"));
+
+    for (let y = 0; y < puckMatrix.length; y++) {
+      for (let x = 0; x < puckMatrix[0].length; x++) {
+        if (puckMatrix[y][x]) {
+          const existingColor = puckMatrix[y][x]["materials"][0]["color"];
+          if (existingColor == 65280) {
+            puck([x * 30 + 35, 0.1, y * 30 + 35], "g");
+          } else {
+            puck([x * 30 + 35, 0.1, y * 30 + 35], "r");
+          }
+        }
+      }
+    }
+  } else {
+    puckMatrix = Array(4)
+      .fill()
+      .map(() => Array(6).fill());
+  }
+  // puckMatrix = Array(4)
+  //   .fill()
+  //   .map(() => Array(6).fill());
+}
 
 InitFollowPuckModel();
 function InitFollowPuckModel() {
@@ -97,8 +123,7 @@ function GenerateRoute() {
   DrawRoute(route);
   RouteInstructions(route);
 
-  const buttonsmt = (document.querySelector("#runRouteButton").style.display =
-    "block");
+  document.querySelector("#runRouteButton").style.display = "block";
 }
 
 function FormatPuckMatrix() {
@@ -277,8 +302,10 @@ threeCanvas.addEventListener("pointerup", () => {
       puckMatrix[(snapCoords[2] - 35) / 30][(snapCoords[0] - 35) / 30] =
         undefined;
     } else {
-      puck(snapCoords);
+      puck(snapCoords, puckColor);
     }
+
+    localStorage.setItem("puckMatrix", JSON.stringify(puckMatrix));
   }
 
   placePuck = false;
@@ -286,8 +313,11 @@ threeCanvas.addEventListener("pointerup", () => {
 
 document.addEventListener("keypress", (event) => {
   if (event.key == "c") {
-    if (puckColor == "g") puckColor = "r";
-    else puckColor = "g";
+    if (puckColor == "g") {
+      puckColor = "r";
+    } else {
+      puckColor = "g";
+    }
   }
 });
 
