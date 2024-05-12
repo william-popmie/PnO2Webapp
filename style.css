@@ -109,15 +109,31 @@ main {
   margin: 10px;
 }
 
+.speedAdjustContainer {
+  display: flex;
+  flex-direction: row;
+}
+
 .speedInTurnContainer {
   display: flex;
   flex-direction: column;
 }
 
-#lSpeedInTurn,
-#rSpeedInTurn {
+.numberInput {
   height: 20px;
   width: 40px;
+  background-color: white;
+  border: 2px solid #1a1a1a;
+  border-radius: 15px;
+
+  padding: 5px;
+  margin: 2px;
+
+  text-align: center;
+}
+
+#routeInput {
+  width: 100px;
   background-color: white;
   border: 2px solid #1a1a1a;
   border-radius: 15px;

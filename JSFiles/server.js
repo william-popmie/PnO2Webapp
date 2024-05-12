@@ -61,21 +61,61 @@ stopButton.addEventListener("mousedown", () => {
 // TURN SPEED
 // -------------------------------------------------------------------------------------------
 
+//Turn Speed
 const updateSpeedInTurnButton = document.querySelector("#submitSpeedInTurn");
-const lSpeedInput = document.querySelector("#lSpeedInTurn");
-const rSpeedInput = document.querySelector("#rSpeedInTurn");
+const lSpeedTurnInput = document.querySelector("#lSpeedInTurn");
+const rSpeedTurnInput = document.querySelector("#rSpeedInTurn");
 
-lSpeedInput.defaultValue = localStorage.getItem("lSpeedValue");
-rSpeedInput.defaultValue = localStorage.getItem("rSpeedValue");
+lSpeedTurnInput.defaultValue = localStorage.getItem("lSpeedTurnValue");
+rSpeedTurnInput.defaultValue = localStorage.getItem("rSpeedTurnValue");
 
 updateSpeedInTurnButton.addEventListener("mousedown", () => {
-  const lSpeedValue = lSpeedInput.value;
-  const rSpeedValue = rSpeedInput.value;
+  const lSpeedTurnValue = lSpeedTurnInput.value;
+  const rSpeedTurnValue = rSpeedTurnInput.value;
 
-  localStorage.setItem("lSpeedValue", lSpeedValue);
-  localStorage.setItem("rSpeedValue", rSpeedValue);
+  localStorage.setItem("lSpeedTurnValue", lSpeedTurnValue);
+  localStorage.setItem("rSpeedTurnValue", rSpeedTurnValue);
 
-  SendDir(`TurnSpeed:${lSpeedValue}:${rSpeedValue}`);
+  console.log("TurnSpeedValue", lSpeedTurnValue, rSpeedTurnValue);
+  SendDir(`TurnSpeed:${lSpeedTurnValue}:${rSpeedTurnValue}`);
+});
+
+// Half Speed
+const updateHalfSpeedButton = document.querySelector("#submitHalfSpeed");
+const lSpeedHalfInput = document.querySelector("#lSpeedHalf");
+const rSpeedHalfInput = document.querySelector("#rSpeedHalf");
+
+lSpeedHalfInput.defaultValue = localStorage.getItem("lSpeedHalfValue");
+rSpeedHalfInput.defaultValue = localStorage.getItem("rSpeedHalfValue");
+
+updateHalfSpeedButton.addEventListener("mousedown", () => {
+  const lSpeedHalfValue = lSpeedHalfInput.value;
+  const rSpeedHalfValue = rSpeedHalfInput.value;
+
+  localStorage.setItem("lSpeedHalfValue", lSpeedHalfValue);
+  localStorage.setItem("rSpeedHalfValue", rSpeedHalfValue);
+
+  console.log("HalfSpeedValue", lSpeedHalfValue, rSpeedHalfValue);
+  SendDir(`HalfSpeed:${lSpeedHalfValue}:${rSpeedHalfValue}`);
+});
+
+// Manual Route
+const startRouteButton = document.querySelector("#submitRouteInput");
+const startRouteInput = document.querySelector("#routeInput");
+startRouteInput.defaultValue = localStorage.getItem("startRouteInput");
+
+startRouteButton.addEventListener("mousedown", () => {
+  const startRouteInputValue = startRouteInput.value;
+  let valid = true;
+  for (let c of startRouteInputValue) {
+    if (!(c == "f" || c == "s" || c == "r" || c == "l" || c == "b")) {
+      valid = false;
+    }
+  }
+  if (valid) {
+    localStorage.setItem("startRouteInput", startRouteInput.value);
+    console.log("correct");
+  }
 });
 
 // -------------------------------------------------------------------------------------------

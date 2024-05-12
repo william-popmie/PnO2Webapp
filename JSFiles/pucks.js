@@ -78,9 +78,6 @@ function AddExistingPucks() {
       .fill()
       .map(() => Array(6).fill());
   }
-  // puckMatrix = Array(4)
-  //   .fill()
-  //   .map(() => Array(6).fill());
 }
 
 InitFollowPuckModel();
