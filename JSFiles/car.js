@@ -1,8 +1,8 @@
 import { gltfLoader, scene } from "./threeSetup";
-import { route } from "./pucks";
+import { instructions, route } from "./pucks";
 
-const carMoveSpeed = 0.5;
-const carTurnSpeed = 0.4;
+let carMoveSpeed = 0.2;
+let carTurnSpeed = 0.4;
 
 let followingRoute = false;
 let turning = false;
@@ -36,6 +36,7 @@ function InitCarModel() {
 // -------------------------------------------------------------------------------------------
 
 let followingRouteIndex = 0;
+let intervalTimer;
 
 function ResetCar(rot) {
   carRot = rot;
@@ -54,30 +55,47 @@ function CrossedIntersection() {
   if (followingRouteIndex < route.length - 1) {
     diffX = route[followingRouteIndex + 1][0] - route[followingRouteIndex][0];
     diffY = route[followingRouteIndex + 1][1] - route[followingRouteIndex][1];
-    console.log("NEW", diffY, diffX);
-
-    if (diffX == 0) {
-      if (diffY == 1) {
-        carRot = 0;
-        console.log("forward");
-      } else {
-        carRot = Math.PI;
-        console.log("backward");
-      }
-    } else {
-      if (diffX == 1) {
-        carRot = -Math.PI / 2;
-        console.log("left");
-      } else {
-        carRot = Math.PI / 2;
-        console.log("right");
-      }
-    }
   } else {
     diffX = 0;
     diffY = 0;
   }
+
   followingRouteIndex++;
+
+  if (instructions[followingRouteIndex - 1] == "r") {
+    intervalTimer = setInterval(() => {
+      TurnCar("r");
+    }, 10);
+  } else if (instructions[followingRouteIndex - 1] == "l") {
+    intervalTimer = setInterval(() => {
+      TurnCar("l");
+    }, 10);
+  } else if (instructions[followingRouteIndex - 1] == "b") {
+    intervalTimer = setInterval(() => {
+      TurnCar("b");
+    }, 10);
+  }
+}
+
+let i = 0;
+function TurnCar(direction) {
+  if (direction == "r") {
+    carRot -= Math.PI / 2 / 100;
+  } else if (direction == "l") {
+    carRot += Math.PI / 2 / 100;
+  } else {
+    carRot += Math.PI / 100;
+  }
+
+  carMoveSpeed = 0;
+
+  if (i > 100) {
+    clearInterval(intervalTimer);
+    carMoveSpeed = 0.2;
+    i = 0;
+  } else {
+    i++;
+  }
 }
 
 let diffX;

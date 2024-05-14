@@ -324,10 +324,4 @@ document.addEventListener("keypress", (event) => {
   }
 });
 
-export {
-  InitFollowPuckModel,
-  GenerateRoute,
-  instructions,
-  route,
-  instructions,
-};
+export { InitFollowPuckModel, GenerateRoute, instructions, route };
