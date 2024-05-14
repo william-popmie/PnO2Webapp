@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { MeshLine, MeshLineMaterial } from "three.meshline";
-import { ResetI } from "./car";
+import { ResetCar } from "./car";
 
 import {
   renderer,
@@ -115,7 +115,13 @@ function GenerateRoute() {
   }
 
   route = MainSolve(board);
-  ResetI();
+  console.log(route);
+  //Car update
+  if (route.length >= 2 && route[1][0] == 1 && route[1][1] == 0) {
+    ResetCar(-Math.PI / 2);
+  } else {
+    ResetCar(0);
+  }
 
   DrawRoute(route);
   RouteInstructions(route);
@@ -318,4 +324,10 @@ document.addEventListener("keypress", (event) => {
   }
 });
 
-export { InitFollowPuckModel, GenerateRoute, instructions, route };
+export {
+  InitFollowPuckModel,
+  GenerateRoute,
+  instructions,
+  route,
+  instructions,
+};

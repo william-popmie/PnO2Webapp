@@ -1,27 +1,18 @@
 import { gltfLoader, scene } from "./threeSetup";
 import { route } from "./pucks";
 
-const carMoveSpeed = 0.25;
+const carMoveSpeed = 0.5;
 const carTurnSpeed = 0.4;
-let carModel;
-let carPos = [35, 35];
-let carRot = 2 * Math.PI;
-let newRot = carRot;
-let moveDir = [0, 0, 0, 0];
-let rotation = [0, 1];
-let rotationStep;
 
-const dirDict = {
-  forward: [1, 0, 0, 0],
-  backward: [0, 1, 0, 0],
-  right: [0, 0, 0, 1],
-  left: [0, 0, 1, 0],
-  pickUp: [0, 0, 0, 0],
-};
+let followingRoute = false;
+let turning = false;
 
 // -------------------------------------------------------------------------------------------
 // INIT CAR MODEL
 // -------------------------------------------------------------------------------------------
+let carModel;
+let carPos = [35, 35];
+let carRot = 0;
 
 function InitCarModel() {
   gltfLoader.load("public/car/scene.gltf", (gltf) => {
@@ -43,69 +34,63 @@ function InitCarModel() {
 // -------------------------------------------------------------------------------------------
 // MOVE LOGIC
 // -------------------------------------------------------------------------------------------
-function SetMoveDir(dir) {
-  moveDir = dir;
+
+let followingRouteIndex = 0;
+
+function ResetCar(rot) {
+  carRot = rot;
+  carPos = [35, 35];
+  followingRouteIndex = 0;
 }
 
-function MoveCar() {
-  if (Math.abs(carRot - newRot) >= Math.PI / 8) {
-    carRot += rotationStep * carTurnSpeed;
-    carRot %= 2 * Math.PI;
-    while (carRot < 0) {
-      carRot += 2 * Math.PI;
+function StartFollowingRoute() {
+  followingRoute = true;
+}
+
+function CrossedIntersection() {
+  carPos[0] = route[followingRouteIndex][1] * 30 + 35;
+  carPos[1] = route[followingRouteIndex][0] * 30 + 35;
+
+  if (followingRouteIndex < route.length - 1) {
+    diffX = route[followingRouteIndex + 1][0] - route[followingRouteIndex][0];
+    diffY = route[followingRouteIndex + 1][1] - route[followingRouteIndex][1];
+    console.log("NEW", diffY, diffX);
+
+    if (diffX == 0) {
+      if (diffY == 1) {
+        carRot = 0;
+        console.log("forward");
+      } else {
+        carRot = Math.PI;
+        console.log("backward");
+      }
+    } else {
+      if (diffX == 1) {
+        carRot = -Math.PI / 2;
+        console.log("left");
+      } else {
+        carRot = Math.PI / 2;
+        console.log("right");
+      }
     }
   } else {
-    carRot = newRot;
-    carPos[0] += Math.cos(carRot) * carMoveSpeed;
-    carPos[1] -= Math.sin(carRot) * carMoveSpeed;
+    diffX = 0;
+    diffY = 0;
   }
+  followingRouteIndex++;
 }
 
-let i = 0;
-function ResetI() {
-  i = 0;
-}
+let diffX;
+let diffY;
 
-function MoveCarAlongRoute() {
-  if (i < route.length - 1) {
-    carPos[0] = route[i][1] * 30 + 35;
-    carPos[1] = route[i][0] * 30 + 35;
-
-    i++;
-    rotation = [route[i][1] - route[i - 1][1], route[i][0] - route[i - 1][0]];
-    newRot =
-      rotation[0] === -1
-        ? Math.PI
-        : rotation[1] == 1
-        ? (3 * Math.PI) / 2
-        : (-Math.PI / 2) * rotation[1];
-    // console.log(newRot, route, i)
-    rotationStep =
-      newRot - carRot > Math.PI
-        ? (newRot - carRot - 2 * Math.PI) / 10
-        : newRot - carRot < -Math.PI
-        ? (newRot - carRot + 2 * Math.PI) / 10
-        : (newRot - carRot) / 10;
-  } else {
-    i = 0;
-  }
-  console.log(i, route.length);
+function UpdateFollowingRouteCar() {
+  carPos[0] += diffY * carMoveSpeed;
+  carPos[1] += diffX * carMoveSpeed;
 
   UpdateCar();
 }
 
 function UpdateCar() {
-  if (route && route.length > i + 1) {
-    if (
-      !(
-        Math.abs(carPos[0] - route[i + 1][1] * 30 - 35) <= 0.4 &&
-        Math.abs(carPos[1] - route[i + 1][0] * 30 - 35) <= 0.4
-      )
-    ) {
-      MoveCar();
-    }
-  }
-
   if (carModel) {
     carModel.position.set(carPos[0], 1.6, carPos[1]);
     carModel.rotation.y = carRot;
@@ -115,8 +100,10 @@ function UpdateCar() {
 export {
   InitCarModel,
   UpdateCar,
-  MoveCarAlongRoute,
-  SetMoveDir,
-  ResetI,
-  dirDict,
+  ResetCar,
+  UpdateFollowingRouteCar,
+  CrossedIntersection,
+  StartFollowingRoute,
+  followingRoute,
+  followingRouteIndex,
 };

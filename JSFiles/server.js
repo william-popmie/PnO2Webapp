@@ -1,4 +1,4 @@
-import { MoveCarAlongRoute } from "./car";
+import { CrossedIntersection } from "./car";
 
 // -------------------------------------------------------------------------------------------
 // SOCKET
@@ -21,18 +21,18 @@ function connect_socket() {
   });
 
   socket.addEventListener("message", (event) => {
-    message = event.data;
-    console.log("message received from pico: \n", message);
+    console.log("message received from pico: \n", event.data);
 
-    if (message == "Crossed intersection") {
-      MoveCarAlongRoute();
-    } else if (message == "Puck received") {
+    if (event.data == "Crossed intersection") {
+      console.log("Crossed");
+      CrossedIntersection();
+    } else if (event.data == "Puck received") {
       AddScore(100);
       scoreCounterTextComponent.textContent = `Score: ${scoreCount}`;
-    } else if (message == "Finished route") {
+    } else if (event.data == "Finished route") {
       EndTimer();
-      UpdateScore(Math.ceil((180 - TimeDiff() / 1000) * 3));
-    } else if (message == "First intersection") {
+      AddScore(Math.ceil((300 - TimeDiff() / 1000) * 3));
+    } else if (event.data == "First intersection") {
       StartTimer();
     }
   });
@@ -62,41 +62,20 @@ stopButton.addEventListener("mousedown", () => {
 // -------------------------------------------------------------------------------------------
 
 //Turn Speed
-const updateSpeedInTurnButton = document.querySelector("#submitSpeedInTurn");
-const lSpeedTurnInput = document.querySelector("#lSpeedInTurn");
-const rSpeedTurnInput = document.querySelector("#rSpeedInTurn");
+const totalMultiplierButton = document.querySelector("#totalMultiplierButton");
+const totalMultiplierInput = document.querySelector("#totalMultiplierInput");
 
-lSpeedTurnInput.defaultValue = localStorage.getItem("lSpeedTurnValue");
-rSpeedTurnInput.defaultValue = localStorage.getItem("rSpeedTurnValue");
+totalMultiplierInput.defaultValue = localStorage.getItem(
+  "totalMultiplierValue"
+);
 
-updateSpeedInTurnButton.addEventListener("mousedown", () => {
-  const lSpeedTurnValue = lSpeedTurnInput.value;
-  const rSpeedTurnValue = rSpeedTurnInput.value;
+totalMultiplierButton.addEventListener("mousedown", () => {
+  const totalMultiplierValue = totalMultiplierInput.value;
 
-  localStorage.setItem("lSpeedTurnValue", lSpeedTurnValue);
-  localStorage.setItem("rSpeedTurnValue", rSpeedTurnValue);
+  localStorage.setItem("totalMultiplierValue", totalMultiplierValue);
 
-  console.log("TurnSpeedValue", lSpeedTurnValue, rSpeedTurnValue);
-  SendDir(`TurnSpeed:${lSpeedTurnValue}:${rSpeedTurnValue}`);
-});
-
-// Half Speed
-const updateHalfSpeedButton = document.querySelector("#submitHalfSpeed");
-const lSpeedHalfInput = document.querySelector("#lSpeedHalf");
-const rSpeedHalfInput = document.querySelector("#rSpeedHalf");
-
-lSpeedHalfInput.defaultValue = localStorage.getItem("lSpeedHalfValue");
-rSpeedHalfInput.defaultValue = localStorage.getItem("rSpeedHalfValue");
-
-updateHalfSpeedButton.addEventListener("mousedown", () => {
-  const lSpeedHalfValue = lSpeedHalfInput.value;
-  const rSpeedHalfValue = rSpeedHalfInput.value;
-
-  localStorage.setItem("lSpeedHalfValue", lSpeedHalfValue);
-  localStorage.setItem("rSpeedHalfValue", rSpeedHalfValue);
-
-  console.log("HalfSpeedValue", lSpeedHalfValue, rSpeedHalfValue);
-  SendDir(`HalfSpeed:${lSpeedHalfValue}:${rSpeedHalfValue}`);
+  console.log("TotalMultiplier", totalMultiplierValue);
+  SendDir(`TotalMultiplier${totalMultiplierValue}`);
 });
 
 // Manual Route
@@ -113,8 +92,11 @@ startRouteButton.addEventListener("mousedown", () => {
     }
   }
   if (valid) {
+    ResetTimer();
+    ResetScore();
+
     localStorage.setItem("startRouteInput", startRouteInput.value);
-    console.log("correct");
+    SendDir(`route${startRouteInputValue}`);
   }
 });
 
@@ -124,6 +106,11 @@ startRouteButton.addEventListener("mousedown", () => {
 
 let scoreCount = 0;
 let scoreCounterTextComponent = document.querySelector("#scoreCounter");
+
+function ResetScore() {
+  scoreCount = 0;
+  scoreCounterTextComponent.textContent = "Score: 0";
+}
 
 function AddScore(addScore) {
   if (addScore === -1) {
@@ -144,6 +131,11 @@ let remainingTime = 300;
 
 let startTime = 0;
 let endTime = 0;
+
+function ResetTimer() {
+  remainingTime = 300;
+  timerText.textContent = "Time: 5:00";
+}
 
 function StartTimer() {
   startTime = Date.now();
@@ -184,4 +176,4 @@ function SendDir(dir) {
   }
 }
 
-export { AddScore, SendDir };
+export { AddScore, SendDir, ResetTimer, ResetScore };

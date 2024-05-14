@@ -1,5 +1,16 @@
+function Test() {
+  console.log("WEIGUH");
+}
+
 import "./style.css";
-import { InitCarModel, UpdateCar, SetMoveDir, dirDict } from "./JSFiles/car";
+import {
+  InitCarModel,
+  StartFollowingRoute,
+  UpdateFollowingRouteCar,
+  followingRoute,
+  followingRouteIndex,
+} from "./JSFiles/car";
+import { route } from "./JSFiles/pucks";
 import {
   InitTHREESetup,
   UpdateRenderer,
@@ -12,7 +23,7 @@ import {
   UpdateAnimationModels,
 } from "./JSFiles/animations";
 
-import { AddScore, SendDir } from "./JSFiles/server";
+import { AddScore, ResetScore, ResetTimer, SendDir } from "./JSFiles/server";
 import { GenerateRoute, instructions } from "./JSFiles/pucks";
 
 var moving = false;
@@ -38,11 +49,12 @@ function animate() {
   requestAnimationFrame(animate);
 
   UpdateRenderer();
-  UpdateControls;
+  UpdateControls();
 
   UpdateAnimationModels();
-  if (moving) {
-    UpdateCar();
+
+  if (followingRoute) {
+    UpdateFollowingRouteCar();
   }
 }
 
@@ -51,26 +63,24 @@ animate();
 // -------------------------------------------------------------------------------------------
 // MANUALS
 // -------------------------------------------------------------------------------------------
-
 document.addEventListener("contextmenu", (event) => event.preventDefault());
 const inputButtons = document.querySelectorAll(".manualInputButton");
 
 inputButtons.forEach((inputButton) => {
   inputButton.addEventListener("mousedown", (e) => {
-    SetMoveDir(dirDict[e.target.id]);
     SendDir(e.target.id);
   });
 
   inputButton.addEventListener("mouseup", (e) => {
-    SetMoveDir([0, 0, 0, 0]);
     SendDir("stop");
   });
 });
 
 document.querySelector("#runRouteButton").addEventListener("mousedown", () => {
-  AddScore(-1);
+  ResetTimer();
+  ResetScore();
 
-  moving = true;
+  StartFollowingRoute();
   SendDir(`route${instructions}`);
   console.log(`route${instructions}`);
 });
